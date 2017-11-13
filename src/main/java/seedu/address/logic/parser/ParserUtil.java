@@ -65,6 +65,8 @@ public class ParserUtil {
         return stringOptional.isPresent() ? Optional.of(stringOptional.get()) : Optional.empty();
     }
 
+    //@@author
+
     /**
      * Parser a {@code Optional<Boolean> complete} into an optional of the same type
      */
