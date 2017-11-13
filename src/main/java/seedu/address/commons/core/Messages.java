@@ -16,5 +16,5 @@ public class Messages {
         "list", "listTask", "edit", "editTask", "export", "exportTask", "select", "selectTask",
         "setPriority", "taskByEnd", "taskByPriority", "find", "findTask", "markTask", "remark", "help",
         "link", "markTask", "setPriority", "taskByEnd", "taskByPriority", "undo", "redo",
-        "history", "clear", "exit"};
+        "history", "clear", "exit", "clearTask", "linkedTasks", "linkedPersons"};
 }
