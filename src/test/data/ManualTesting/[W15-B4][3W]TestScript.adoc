@@ -1,11 +1,11 @@
 = Manual Test Script For '[W15-B4][3W]'
 
 == How to load the data files
-As our applcation consists of one address book and one task book, and our separate storage of tasks and contacts, we have put the sample address book xml file and task book xml file inside the same folder named `[W15-B4][3W]SampleData`. +
+As our applcation consists of one address book and one task book, and our separate storage of tasks and contacts, we have put the sample address book xml file and task book xml file inside the same folder named `[W15-B4][3W]SampleData` and zipped it for submission. +
 
-. Create a new empty folder for conducting this manual testing.
-. Copy or move the sample data folder into the new folder.
-. Put the Jar file into the same folder.
+. Unzip the sample data zip into a new folder. You can see a new folder called `[W15-B4][3W]SampleData`.
+. Put the Jar file into this folder called `[W15-B4][3W]SampleData`.
+. Open this folder, you can also see a folder called data, this is the folder where our manual test data are.
 
 After the above three steps, our app will be able to read and write from the sample data xml files. +
 
@@ -72,6 +72,10 @@ You can see our friend Jim is deleted.
 ==== addTask command +
 `addTask n/manual testing d/this should be around 20min s/20-11-2017 11:00am f/20-11-2017 11:20am c/3 t/assignment` +
 This command adds a new task to the task list. You can see there's a new task called manual testing being added as the 11th task in the task list.
+
+==== findTask command +
+`findTask picnic/demo/meeting` +
+You can see there are three tasks listed, all of them are common test cases used by developers of this team.
 
 ==== editTask command +
 `editTask 11 s/20-11-2017 10:00am f/20-11-2017 10:20am` +
