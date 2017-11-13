@@ -27,10 +27,14 @@ Responsibilities: TaskBook functionalities
 
 === Jia Zhixin
 image::yijinl.jpg[width="150", align="left"]
-{empty}[https://github.com/nusjzx[github]] [<<johndoe#, portfolio>>]
+{empty}[https://github.com/nusjzx[github]] [<<jiazhixin#, portfolio>>]
 
 Role: Developer +
-Responsibilities: Data
+Responsibilities: link operations between contacts and tasks
+
+* Components in charge of: Model & Logic
+* Aspects/tools in charge of: JUnit testing, Developer Guide
+* Code written: [https://github.com/CS2103AUG2017-W15-B4/main/blob/master/collated/main/nusjzx.md[functional code]][https://github.com/CS2103AUG2017-W15-B4/main/blob/master/collated/test/nusjzx.md[test code]]
 
 '''
 
