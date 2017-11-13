@@ -81,6 +81,8 @@ public class AddressBookParser {
         case EditTaskCommand.COMMAND_ALIAS:
             return new EditTaskCommandParser().parse(arguments);
 
+        //@@author
+
         case SelectCommand.COMMAND_WORD:
         case SelectCommand.COMMAND_ALIAS:
             return new SelectCommandParser().parse(arguments);
@@ -114,6 +116,8 @@ public class AddressBookParser {
         case MarkTaskCommand.COMMAND_ALIAS:
             return new MarkTaskCommandParser().parse(arguments);
 
+        //@@author
+
         case ClearCommand.COMMAND_WORD:
         case ClearCommand.COMMAND_ALIAS:
             return new ClearCommand();
@@ -141,6 +145,8 @@ public class AddressBookParser {
         case ListTaskCommand.COMMAND_WORD:
         case ListTaskCommand.COMMAND_ALIAS:
             return new ListTaskCommand();
+
+        //@@author
 
         case ExportCommand.COMMAND_WORD:
         case ExportCommand.COMMAND_ALIAS:
