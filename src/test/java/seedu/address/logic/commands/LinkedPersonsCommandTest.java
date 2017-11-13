@@ -39,7 +39,7 @@ public class LinkedPersonsCommandTest {
     @Test
     public void executeLinkedPersonsSuccessful() {
 
-        ReadOnlyTask firstTask= model.getTaskBook().getTaskList().get(0);
+        ReadOnlyTask firstTask = model.getTaskBook().getTaskList().get(0);
         ArrayList<Integer> firstId = new ArrayList<>();
         firstId.add(model.getAddressBook().getPersonList().get(0).getId());
         Task linkedTask= new Task(firstTask);

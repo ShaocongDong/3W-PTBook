@@ -69,8 +69,7 @@ public class LinkCommandTest {
         try {
             CommandResult commandResult = linkCommand.execute();
             assertEquals(String.format(linkCommand.MESSAGE_LINK_SUCCESS,
-                    getTypicalTaskbook().getTaskList().get(indexInteger).getName()) +
-                    personNameList,
+                    getTypicalTaskbook().getTaskList().get(indexInteger).getName()) + personNameList,
                     commandResult.feedbackToUser);
         } catch (CommandException ce) {
             throw new IllegalArgumentException("Execution of command should not fail.", ce);
@@ -80,7 +79,6 @@ public class LinkCommandTest {
     /**
      * Assert execution failure by default, a wrong execution command inputted.
      * @param index , the index of the task
-     * @param personIndices, persons' indices to be linked
      * @param expectedMessage , the expected message String
      */
     private void assertExecutionFailure(Index index, ArrayList<Index> personIndices, String expectedMessage) {

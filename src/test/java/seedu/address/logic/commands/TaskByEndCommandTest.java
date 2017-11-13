@@ -39,18 +39,18 @@ public class TaskByEndCommandTest {
             assert false : "There are duplicate tasks in this Taskbook";
         }
 
-        TaskBook sorted_tb = new TaskBook();
+        TaskBook sortedTb = new TaskBook();
 
         try {
-            sorted_tb.addTask(firstTask);
-            sorted_tb.addTask(secondTask);
-            sorted_tb.addTask(thirdTask);
+            sortedTb.addTask(firstTask);
+            sortedTb.addTask(secondTask);
+            sortedTb.addTask(thirdTask);
         } catch (DuplicateTaskException e) {
             assert false : "There are duplicate tasks in this Taskbook";
         }
 
         model = new ModelManager(getTypicalAddressBook(), tb, new UserPrefs());
-        expectedModel = new ModelManager(getTypicalAddressBook(), sorted_tb, new UserPrefs());
+        expectedModel = new ModelManager(getTypicalAddressBook(), sortedTb, new UserPrefs());
         taskByEndCommand = new TaskByEndCommand();
         taskByEndCommand.setData(model, null, null);
     }

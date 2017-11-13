@@ -1,7 +1,7 @@
 //@@author nusjzx
 package seedu.address.logic.commands;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 import static seedu.address.logic.commands.CommandTestUtil.assertCommandSuccess;
 import static seedu.address.logic.commands.CommandTestUtil.showFirstTaskOnly;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
@@ -39,7 +39,7 @@ public class LinkedTasksCommandTest {
     @Test
     public void executeLinkedPersonsSuccessful() {
 
-        ReadOnlyTask firstTask= model.getTaskBook().getTaskList().get(0);
+        ReadOnlyTask firstTask = model.getTaskBook().getTaskList().get(0);
         ArrayList<Integer> firstId = new ArrayList<>();
         ReadOnlyPerson firstPerson = model.getAddressBook().getPersonList().get(0);
         firstId.add(firstPerson.getId());

@@ -1,1225 +1,66 @@
 # ShaocongDong
-###### \java\seedu\address\commons\events\model\TaskBookChangedEvent.java
-``` java
-package seedu.address.commons.events.model;
+###### /resources/view/TaskListPanel.fxml
+``` fxml
 
-import seedu.address.commons.events.BaseEvent;
-import seedu.address.model.ReadOnlyTaskBook;
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.VBox?>
 
-/** Indicates the AddressBook in the model has changed*/
-public class TaskBookChangedEvent extends BaseEvent {
-
-    public final ReadOnlyTaskBook data;
-
-    public TaskBookChangedEvent(ReadOnlyTaskBook data) {
-        this.data = data;
-    }
-
-    @Override
-    public String toString() {
-        return "number of tasks " + data.getTaskList().size() + ", number of tags " + data.getTagList().size();
-    }
-}
+<VBox styleClass="background" stylesheets="@DarkTheme.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+  <ListView fx:id="taskListView" styleClass="anchor-pane" stylesheets="@DarkTheme.css" VBox.vgrow="ALWAYS" />
+</VBox>
 ```
-###### \java\seedu\address\commons\events\ui\TaskPanelSelectionChangedEvent.java
-``` java
-package seedu.address.commons.events.ui;
+###### /resources/view/TaskListCard.fxml
+``` fxml
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-import seedu.address.commons.events.BaseEvent;
-import seedu.address.ui.TaskCard;
-
-/**
- * Represents a selection change in the Person List Panel
- */
-public class TaskPanelSelectionChangedEvent extends BaseEvent {
-
-
-    private final TaskCard newSelection;
-
-    public TaskPanelSelectionChangedEvent(TaskCard newSelection) {
-        this.newSelection = newSelection;
-    }
-
-    @Override
-    public String toString() {
-        return this.getClass().getSimpleName();
-    }
-
-    public TaskCard getNewSelection() {
-        return newSelection;
-    }
-}
+<HBox id="cardPane" fx:id="cardPane" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
+  <GridPane HBox.hgrow="ALWAYS">
+    <columnConstraints>
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="150" />
+    </columnConstraints>
+    <VBox alignment="CENTER_LEFT" minHeight="105" GridPane.columnIndex="0">
+      <padding>
+        <Insets bottom="5" left="15" right="5" top="5" />
+      </padding>
+      <HBox alignment="CENTER_LEFT" spacing="5">
+        <Label fx:id="id" styleClass="cell_big_label">
+          <minWidth>
+            <!-- Ensures that the label text is never truncated -->
+            <Region fx:constant="USE_PREF_SIZE" />
+          </minWidth>
+        </Label>
+        <Label fx:id="name" styleClass="cell_big_label" text="\$name" />
+            <Label fx:id="priority" alignment="CENTER_RIGHT" style="-fx-border-color: red; -fx-border-style: dotted; -fx-background-color: lightblue; -fx-text-fill: rgb(193, 66, 66);" textAlignment="RIGHT" textFill="#ff7803">
+               <font>
+                  <Font name="Courier Bold" size="18.0" />
+               </font>
+            </Label>
 ```
-###### \java\seedu\address\logic\commands\AddTaskCommand.java
-``` java
-package seedu.address.logic.commands;
-
-import static java.util.Objects.requireNonNull;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_DESCRIPTION;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_END_DATE_TIME;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_PRIORITY;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_START_DATE_TIME;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
-
-import seedu.address.logic.commands.exceptions.CommandException;
-import seedu.address.model.task.ReadOnlyTask;
-import seedu.address.model.task.Task;
-import seedu.address.model.task.exceptions.DuplicateTaskException;
-
-/**
- * Adds a person to the address book.
- */
-public class AddTaskCommand extends UndoableCommand {
-
-    public static final String COMMAND_WORD = "addTask";
-    public static final String COMMAND_ALIAS = "at";
-
-    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Adds a task to the task book. "
-            + "Parameters: "
-            + PREFIX_NAME + "NAME "
-            + PREFIX_DESCRIPTION + "Description "
-            + PREFIX_START_DATE_TIME + "START TIME "
-            + PREFIX_END_DATE_TIME + "END TIME "
-            + PREFIX_PRIORITY + "INTEGER[1~5] "
-            + "[" + PREFIX_TAG + "TAG]...\n"
-            + "Example: " + COMMAND_WORD + " "
-            + PREFIX_NAME + "picnic "
-            + PREFIX_DESCRIPTION + "have fun at Botanic Garden "
-            + PREFIX_START_DATE_TIME + "26-11-2017 11:00am "
-            + PREFIX_END_DATE_TIME + "26-11-2017 12:00am "
-            + PREFIX_PRIORITY + "3 "
-            + PREFIX_TAG + "friends ";
-
-    public static final String MESSAGE_SUCCESS = "New task added: %1$s";
-    public static final String MESSAGE_DUPLICATE_TASK = "This task already exists in the task book";
-
-    private final Task toAdd;
-
-    /**
-     * Creates an AddCommand to add the specified {@code ReadOnlyPerson}
-     */
-    public AddTaskCommand(ReadOnlyTask task) {
-        toAdd = new Task(task);
-    }
-
-    @Override
-    public CommandResult executeUndoableCommand() throws CommandException {
-        requireNonNull(model);
-        try {
-            model.addTask(toAdd);
-            return new CommandResult(String.format(MESSAGE_SUCCESS, toAdd));
-        } catch (DuplicateTaskException e) {
-            throw new CommandException(MESSAGE_DUPLICATE_TASK);
-        }
-
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        return other == this // short circuit if same object
-                || (other instanceof AddTaskCommand // instanceof handles nulls
-                && toAdd.equals(((AddTaskCommand) other).toAdd));
-    }
-}
+###### /resources/view/TaskListCard.fxml
+``` fxml
+      </HBox>
+      <FlowPane fx:id="tags" />
+      <Label fx:id="description" styleClass="cell_small_label" text="\$description" />
+      <Label fx:id="startDateTime" styleClass="cell_small_label" text="\$start" />
+      <Label fx:id="endDateTime" styleClass="cell_small_label" text="\$end" />
+    </VBox>
+      <rowConstraints>
+         <RowConstraints />
+      </rowConstraints>
+  </GridPane>
+</HBox>
 ```
-###### \java\seedu\address\logic\commands\ClearTaskCommand.java
-``` java
-package seedu.address.logic.commands;
-
-import static java.util.Objects.requireNonNull;
-
-import seedu.address.model.TaskBook;
-
-/**
- * Clears the address book.
- */
-public class ClearTaskCommand extends UndoableCommand {
-
-    public static final String COMMAND_WORD = "clearTask";
-    public static final String COMMAND_ALIAS = "ct";
-    public static final String MESSAGE_SUCCESS = "Task book has been cleared!";
-
-
-    @Override
-    public CommandResult executeUndoableCommand() {
-        requireNonNull(model);
-        model.resetData(new TaskBook());
-        return new CommandResult(MESSAGE_SUCCESS);
-    }
-}
-```
-###### \java\seedu\address\logic\commands\DeleteTaskCommand.java
-``` java
-package seedu.address.logic.commands;
-
-import java.util.List;
-
-import seedu.address.commons.core.Messages;
-import seedu.address.commons.core.index.Index;
-import seedu.address.logic.commands.exceptions.CommandException;
-import seedu.address.model.task.ReadOnlyTask;
-import seedu.address.model.task.exceptions.TaskNotFoundException;
-
-/**
- * Deletes a task identified using it's last displayed index from the address book.
- */
-public class DeleteTaskCommand extends UndoableCommand {
-
-    public static final String COMMAND_WORD = "deleteTask";
-    public static final String COMMAND_ALIAS = "dt";
-
-    public static final String MESSAGE_USAGE = COMMAND_WORD
-            + ": Deletes the task identified by the index number used in the last task listing.\n"
-            + "Parameters: INDEX (must be a positive integer)\n"
-            + "Example: " + COMMAND_WORD + " 1";
-
-    public static final String MESSAGE_DELETE_TASK_SUCCESS = "Deleted Task: %1$s";
-
-    private final Index targetIndex;
-
-    public DeleteTaskCommand(Index targetIndex) {
-        this.targetIndex = targetIndex;
-    }
-
-
-    @Override
-    public CommandResult executeUndoableCommand() throws CommandException {
-
-        List<ReadOnlyTask> lastShownList = model.getSortedTaskList();
-
-        if (targetIndex.getZeroBased() >= lastShownList.size()) {
-            throw new CommandException(Messages.MESSAGE_INVALID_TASK_DISPLAYED_INDEX);
-        }
-
-        ReadOnlyTask taskToDelete = lastShownList.get(targetIndex.getZeroBased());
-
-        try {
-            model.deleteTask(taskToDelete);
-        } catch (TaskNotFoundException tnfe) {
-            assert false : "The target task cannot be missing";
-        }
-
-        return new CommandResult(String.format(MESSAGE_DELETE_TASK_SUCCESS, taskToDelete));
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        return other == this // short circuit if same object
-                || (other instanceof DeleteTaskCommand // instanceof handles nulls
-                && this.targetIndex.equals(((DeleteTaskCommand) other).targetIndex)); // state check
-    }
-}
-```
-###### \java\seedu\address\logic\commands\EditTaskCommand.java
-``` java
-    @Override
-    public CommandResult executeUndoableCommand() throws CommandException {
-        List<ReadOnlyTask> lastShownList = model.getSortedTaskList();
-
-        if (index.getZeroBased() >= lastShownList.size()) {
-            throw new CommandException(Messages.MESSAGE_INVALID_TASK_DISPLAYED_INDEX);
-        }
-
-        ReadOnlyTask taskToEdit = lastShownList.get(index.getZeroBased());
-
-        Task editedTask = null;
-        try {
-            editedTask = createEditedTask(taskToEdit, editTaskDescriptor);
-        } catch (IllegalValueException e) {
-            throw new CommandException(MESSAGE_DATE_TIME_TASK);
-        }
-
-        try {
-            model.updateTask(taskToEdit, editedTask);
-        } catch (DuplicateTaskException dpe) {
-            throw new CommandException(MESSAGE_DUPLICATE_TASK);
-        } catch (TaskNotFoundException tnfe) {
-            throw new AssertionError("The target task cannot be missing");
-        }
-        model.updateFilteredTaskList(PREDICATE_SHOW_ALL_TASKS);
-        return new CommandResult(String.format(MESSAGE_EDIT_TASK_SUCCESS, editedTask));
-    }
-
-    /**
-     * Creates and returns a {@code Task} with the details of {@code taskToEdit}
-     * edited with {@code editTaskDescriptor}.
-     */
-    private static Task createEditedTask(ReadOnlyTask taskToEdit,
-                                             EditTaskDescriptor editTaskDescriptor) throws IllegalValueException {
-        assert taskToEdit != null;
-
-        Name updatedTaskName = editTaskDescriptor.getName().orElse(taskToEdit.getName());
-        Description updatedDescription = editTaskDescriptor.getDescription().orElse(taskToEdit.getDescription());
-        DateTime updatedStartDateTime = editTaskDescriptor.getStartDateTime().orElse(taskToEdit.getStartDateTime());
-        DateTime updatedEndDateTime = editTaskDescriptor.getEndDateTime().orElse(taskToEdit.getEndDateTime());
-        if (updatedStartDateTime.compareTo(updatedEndDateTime) == -1) {
-            throw new IllegalValueException(MESSAGE_DATE_TIME_TASK);
-        }
-        Set<Tag> updatedTags = editTaskDescriptor.getTags().orElse(taskToEdit.getTags());
-        Boolean updateComplete = editTaskDescriptor.getComplete().orElse(taskToEdit.getComplete());
-        //Remark updatedRemark = taskToEdit.getRemark(); // edit command does not allow editing remarks
-        Integer originalPriority = taskToEdit.getPriority(); // edit command is not used to update priority
-        Integer id = taskToEdit.getId();
-        ArrayList<Integer> peopleIds = taskToEdit.getPeopleIds();
-        return new Task(updatedTaskName, updatedDescription, updatedStartDateTime, updatedEndDateTime,
-                updatedTags, updateComplete, originalPriority, id, peopleIds);
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        // short circuit if same object
-        if (other == this) {
-            return true;
-        }
-
-        // instanceof handles nulls
-        if (!(other instanceof EditTaskCommand)) {
-            return false;
-        }
-
-        // state check
-        EditTaskCommand e = (EditTaskCommand) other;
-        return index.equals(e.index)
-                && editTaskDescriptor.equals(e.editTaskDescriptor);
-    }
-
-    /**
-     * Stores the details to edit the task with. Each non-empty field value will replace the
-     * corresponding field value of the task.
-     */
-    public static class EditTaskDescriptor {
-        private Name taskName;
-        private Description description;
-        private DateTime start;
-        private DateTime end;
-        private Set<Tag> tags;
-        private Boolean complete;
-
-        public EditTaskDescriptor() {}
-
-        public EditTaskDescriptor(EditTaskDescriptor toCopy) {
-            this.taskName = toCopy.taskName;
-            this.description = toCopy.description;
-            this.start = toCopy.start;
-            this.end = toCopy.end;
-            this.tags = toCopy.tags;
-            this.complete = toCopy.complete;
-        }
-
-        /**
-         * Returns true if at least one field is edited.
-         */
-        public boolean isAnyFieldEdited() {
-            return CollectionUtil.isAnyNonNull(this.taskName, this.description, this.start, this.end,
-                    this.tags, this.complete);
-        }
-
-        public void setName(Name taskName) {
-            this.taskName = taskName;
-        }
-
-        public Optional<Name> getName() {
-            return Optional.ofNullable(taskName);
-        }
-
-        public void setDescription(Description description) {
-            this.description = description;
-        }
-
-        public Optional<Description> getDescription() {
-            return Optional.ofNullable(description);
-        }
-
-        public void setStart(DateTime start) {
-            this.start = start;
-        }
-
-        public Optional<DateTime> getStartDateTime() {
-            return Optional.ofNullable(start);
-        }
-
-        public void setEnd(DateTime end) {
-            this.end = end;
-        }
-
-        public Optional<DateTime> getEndDateTime() {
-            return Optional.ofNullable(end);
-        }
-
-        public void setTags(Set<Tag> tags) {
-            this.tags = tags;
-        }
-
-        public Optional<Set<Tag>> getTags() {
-            return Optional.ofNullable(tags);
-        }
-
-        public void setComplete(Boolean complete) {
-            this.complete = complete;
-        }
-
-        public Optional<Boolean> getComplete() {
-            return Optional.ofNullable(complete);
-        }
-
-        @Override
-        public boolean equals(Object other) {
-            // short circuit if same object
-            if (other == this) {
-                return true;
-            }
-
-            // instanceof handles nulls
-            if (!(other instanceof EditTaskDescriptor)) {
-                return false;
-            }
-
-            // state check
-            EditTaskDescriptor e = (EditTaskDescriptor) other;
-
-            return getName().equals(e.getName())
-                    && getDescription().equals(e.getDescription())
-                    && getStartDateTime().equals(e.getStartDateTime())
-                    && getEndDateTime().equals(e.getEndDateTime())
-                    && getTags().equals(e.getTags())
-                    && getComplete().equals(e.getComplete());
-        }
-    }
-}
-
-```
-###### \java\seedu\address\logic\commands\SelectTaskCommand.java
-``` java
-package seedu.address.logic.commands;
-
-import java.util.List;
-
-import seedu.address.commons.core.EventsCenter;
-import seedu.address.commons.core.Messages;
-import seedu.address.commons.core.index.Index;
-import seedu.address.commons.events.ui.JumpToTaskListRequestEvent;
-import seedu.address.logic.commands.exceptions.CommandException;
-import seedu.address.model.task.ReadOnlyTask;
-
-/**
- * Selects a task identified using it's last displayed index from the task book.
- */
-public class SelectTaskCommand extends Command {
-
-    public static final String COMMAND_WORD = "selectTask";
-    public static final String COMMAND_ALIAS = "st";
-
-    public static final String MESSAGE_USAGE = COMMAND_WORD
-            + ": Selects the task identified by the index number used in the last task listing.\n"
-            + "Parameters: INDEX (must be a positive integer)\n"
-            + "Example: " + COMMAND_WORD + " 1";
-
-    public static final String MESSAGE_SELECT_TASK_SUCCESS = "Selected Task: %1$s";
-
-    private final Index targetIndex;
-
-    public SelectTaskCommand(Index targetIndex) {
-        this.targetIndex = targetIndex;
-    }
-
-    @Override
-    public CommandResult execute() throws CommandException {
-
-        List<ReadOnlyTask> lastShownList = model.getSortedTaskList();
-
-        if (targetIndex.getZeroBased() >= lastShownList.size()) {
-            throw new CommandException(Messages.MESSAGE_INVALID_TASK_DISPLAYED_INDEX);
-        }
-
-        EventsCenter.getInstance().post(new JumpToTaskListRequestEvent(targetIndex));
-        return new CommandResult(String.format(MESSAGE_SELECT_TASK_SUCCESS, targetIndex.getOneBased()));
-
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        return other == this // short circuit if same object
-                || (other instanceof SelectTaskCommand // instanceof handles nulls
-                && this.targetIndex.equals(((SelectTaskCommand) other).targetIndex)); // state check
-    }
-}
-```
-###### \java\seedu\address\logic\commands\SetPriorityCommand.java
-``` java
-package seedu.address.logic.commands;
-
-import static seedu.address.model.Model.PREDICATE_SHOW_ALL_TASKS;
-
-import java.util.List;
-
-import seedu.address.commons.core.Messages;
-import seedu.address.commons.core.index.Index;
-import seedu.address.logic.commands.exceptions.CommandException;
-import seedu.address.model.task.ReadOnlyTask;
-import seedu.address.model.task.Task;
-import seedu.address.model.task.exceptions.DuplicateTaskException;
-import seedu.address.model.task.exceptions.TaskNotFoundException;
-
-
-/**
- * Sets the priority of a task identified as completed using it's last displayed index from the address book.
- */
-public class SetPriorityCommand extends UndoableCommand {
-
-    public static final String COMMAND_WORD = "setPriority";
-    public static final String COMMAND_ALIAS = "stp";
-
-    public static final String MESSAGE_USAGE = COMMAND_WORD
-            + ": Sets the priority by the new value as the user specified, which is between 1~5\n"
-            + "Parameters: INDEX (must be a positive integer) c/PRIORITY (must be an integer between 1 and 5\n"
-            + "Example: " + COMMAND_WORD + " 1 c/2";
-
-    public static final String MESSAGE_UPDATE_TASK_PRIORITY_SUCCESS = "Updated the Priority of Task %1$s";
-    public static final String MESSAGE_UPDATE_TASK_PRIORITY_OUT_OF_RANGE = "Priority value should be 1~5";
-
-    private final Index targetIndex;
-    private final Integer priority;
-
-    public SetPriorityCommand(Index targetIndex, Integer priority) {
-        this.targetIndex = targetIndex;
-        this.priority = priority;
-    }
-
-
-    @Override
-    public CommandResult executeUndoableCommand() throws CommandException {
-
-        List<ReadOnlyTask> lastShownList = model.getSortedTaskList();
-
-        if (targetIndex.getZeroBased() >= lastShownList.size()) {
-            throw new CommandException(Messages.MESSAGE_INVALID_TASK_DISPLAYED_INDEX);
-        }
-
-        ReadOnlyTask taskToUpdate = lastShownList.get(targetIndex.getZeroBased());
-        Task updatedTask = createUpdatedTask(taskToUpdate, priority);
-
-        // Checking if the priority value inputted is out of range
-        if (updatedTask == null) {
-            throw new CommandException(MESSAGE_UPDATE_TASK_PRIORITY_OUT_OF_RANGE);
-        }
-
-        try {
-            model.updateTask(taskToUpdate, updatedTask);
-        } catch (TaskNotFoundException tnfe) {
-            assert false : "The target task cannot be missing";
-        } catch (DuplicateTaskException dte) {
-            assert false : "The target updated can cause duplication";
-        }
-
-        model.updateFilteredTaskList(PREDICATE_SHOW_ALL_TASKS);
-        return new CommandResult(String.format(MESSAGE_UPDATE_TASK_PRIORITY_SUCCESS, taskToUpdate.getName()));
-    }
-
-    /**
-     * Create an updated task by only modifying its priority property
-     * @param target , the targeted task to be edited
-     * @param value , the new priority value
-     * @return the updated task or null
-     */
-    public Task createUpdatedTask (ReadOnlyTask target, Integer value) {
-        // Preliminary checking
-        if (value < 0 || value > 5) {
-            return null;
-        }
-
-        Task updatedTask = new Task(
-                target.getName(),
-                target.getDescription(),
-                target.getStartDateTime(),
-                target.getEndDateTime(),
-                target.getTags(),
-                target.getComplete(),
-                value,
-                target.getId(),
-                target.getPeopleIds());
-
-        return updatedTask;
-    }
-
-
-    @Override
-    public boolean equals(Object other) {
-        return other == this // short circuit if same object
-                || (other instanceof SetPriorityCommand // instanceof handles nulls
-                && this.targetIndex.equals(((SetPriorityCommand) other).targetIndex)); // state check
-    }
-}
-```
-###### \java\seedu\address\logic\commands\TaskByPriorityCommand.java
-``` java
-package seedu.address.logic.commands;
-
-/**
- * Task sorted by priority value from 1 to 5
- */
-public class TaskByPriorityCommand extends Command {
-
-    public static final String COMMAND_WORD = "taskByPriority";
-    public static final String COMMAND_ALIAS = "tbp";
-
-    public static final String MESSAGE_SUCCESS = "Tasks have been sorted by priority.";
-
-
-    @Override
-    public CommandResult execute() {
-        model.taskByPriority();
-        return new CommandResult(MESSAGE_SUCCESS);
-    }
-
-}
-```
-###### \java\seedu\address\logic\parser\AddTaskCommandParser.java
-``` java
-package seedu.address.logic.parser;
-
-import static seedu.address.commons.core.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_DESCRIPTION;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_END_DATE_TIME;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_PRIORITY;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_START_DATE_TIME;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
-
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Stream;
-
-import seedu.address.commons.exceptions.IllegalValueException;
-import seedu.address.logic.commands.AddTaskCommand;
-import seedu.address.logic.parser.exceptions.ParseException;
-import seedu.address.model.tag.Tag;
-import seedu.address.model.task.DateTime;
-import seedu.address.model.task.Description;
-import seedu.address.model.task.Name;
-import seedu.address.model.task.ReadOnlyTask;
-import seedu.address.model.task.Task;
-
-/**
- * A parser class for addTask Command
- */
-public class AddTaskCommandParser implements Parser<AddTaskCommand> {
-
-    /**
-     * Parses the given {@code String} of arguments in the context of the AddTask Command
-     * and returns an AddTask Command object for execution.
-     * @throws ParseException if the user input does not conform the expected format
-     */
-    public AddTaskCommand parse(String args) throws ParseException {
-        ArgumentMultimap argMultimap =
-                ArgumentTokenizer.tokenize(args, PREFIX_NAME, PREFIX_DESCRIPTION,
-                        PREFIX_START_DATE_TIME, PREFIX_END_DATE_TIME, PREFIX_PRIORITY, PREFIX_TAG);
-
-        if (!arePrefixesPresent(argMultimap, PREFIX_NAME, PREFIX_DESCRIPTION,
-                PREFIX_START_DATE_TIME, PREFIX_END_DATE_TIME)) {
-            throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddTaskCommand.MESSAGE_USAGE));
-        }
-
-        try {
-            Name name = new Name(ParserUtil.parseString(argMultimap.getValue(PREFIX_NAME)).get());
-            Description description =
-                    new Description(ParserUtil.parseString(argMultimap.getValue(PREFIX_DESCRIPTION)).get());
-            DateTime startDateTime =
-                    new DateTime(ParserUtil.parseString(argMultimap.getValue(PREFIX_START_DATE_TIME)).get());
-            DateTime endDateTime =
-                    new DateTime(ParserUtil.parseString(argMultimap.getValue(PREFIX_END_DATE_TIME)).get());
-
-            if (startDateTime.compareTo(endDateTime) == -1) {
-                throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddTaskCommand.MESSAGE_USAGE));
-            }
-
-            Optional<Integer> priority = ParserUtil.parseInteger(argMultimap.getValue(PREFIX_PRIORITY));
-
-            Set<Tag> tagList = ParserUtil.parseTags(argMultimap.getAllValues(PREFIX_TAG));
-            Boolean complete = false;
-            ReadOnlyTask task;
-            // Renew the task object with the priority parameter specially set if given
-            if (priority.isPresent()) {
-                Integer priorityValue = priority.get();
-                task = new Task(name, description, startDateTime, endDateTime, tagList, complete, priorityValue);
-            } else {
-                task = new Task(name, description, startDateTime, endDateTime, tagList, complete);
-            }
-
-            return new AddTaskCommand(task);
-        } catch (IllegalValueException ive) {
-            throw new ParseException(ive.getMessage(), ive);
-        }
-    }
-
-    /**
-     * Returns true if none of the prefixes contains empty {@code Optional} values in the given
-     * {@code ArgumentMultimap}.
-     */
-    private static boolean arePrefixesPresent(ArgumentMultimap argumentMultimap, Prefix... prefixes) {
-        return Stream.of(prefixes).allMatch(prefix -> argumentMultimap.getValue(prefix).isPresent());
-    }
-}
-```
-###### \java\seedu\address\logic\parser\DeleteTaskCommandParser.java
-``` java
-package seedu.address.logic.parser;
-
-import static seedu.address.commons.core.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
-
-import seedu.address.commons.core.index.Index;
-import seedu.address.commons.exceptions.IllegalValueException;
-import seedu.address.logic.commands.DeleteTaskCommand;
-import seedu.address.logic.parser.exceptions.ParseException;
-
-/**
- * Parses input arguments and creates a new DeleteCommand object
- */
-public class DeleteTaskCommandParser implements Parser<DeleteTaskCommand> {
-
-    /**
-     * Parses the given {@code String} of arguments in the context of the DeleteTaskCommand
-     * and returns an DeleteTaskCommand object for execution.
-     * @throws ParseException if the user input does not conform the expected format
-     */
-    public DeleteTaskCommand parse(String args) throws ParseException {
-        try {
-            Index index = ParserUtil.parseIndex(args);
-            return new DeleteTaskCommand(index);
-        } catch (IllegalValueException ive) {
-            throw new ParseException(
-                    String.format(MESSAGE_INVALID_COMMAND_FORMAT, DeleteTaskCommand.MESSAGE_USAGE));
-        }
-    }
-
-}
-```
-###### \java\seedu\address\logic\parser\EditTaskCommandParser.java
-``` java
-    /**
-     * Parses the given {@code String} of arguments in the context of the EditTaskCommand
-     * and returns an EditTaskCommand object for execution.
-     * @throws ParseException if the user input does not conform the expected format
-     */
-    public EditTaskCommand parse(String args) throws ParseException {
-        requireNonNull(args);
-        ArgumentMultimap argMultimap =
-                ArgumentTokenizer.tokenize(args, PREFIX_NAME, PREFIX_DESCRIPTION, PREFIX_START_DATE_TIME,
-                        PREFIX_END_DATE_TIME, PREFIX_TAG);
-
-        Index index;
-
-        try {
-            index = ParserUtil.parseIndex(argMultimap.getPreamble());
-        } catch (IllegalValueException ive) {
-            throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, EditTaskCommand.MESSAGE_USAGE));
-        }
-
-        EditTaskDescriptor editTaskDescriptor = new EditTaskDescriptor();
-        try {
-            Optional<String> parserName = ParserUtil.parseString(argMultimap.getValue(PREFIX_NAME));
-            if (parserName.isPresent()) {
-                editTaskDescriptor.setName(new Name(parserName.get()));
-            }
-            Optional<String> parserDescription = ParserUtil.parseString(argMultimap.getValue(PREFIX_DESCRIPTION));
-            if (parserDescription.isPresent()) {
-                editTaskDescriptor.setDescription(new Description(parserDescription.get()));
-            }
-
-            Optional<String> parserStart = ParserUtil.parseString(argMultimap.getValue(PREFIX_START_DATE_TIME));
-            DateTime startDateTime = null;
-            if (parserStart.isPresent()) {
-                //editTaskDescriptor.setStart(new DateTime(parserStart.get()));
-                startDateTime = new DateTime(parserStart.get());
-                editTaskDescriptor.setStart(new DateTime(parserStart.get()));
-            }
-
-            Optional<String> parserEnd = ParserUtil.parseString(argMultimap.getValue(PREFIX_END_DATE_TIME));
-            DateTime endDateTime = null;
-            if (parserEnd.isPresent()) {
-                //editTaskDescriptor.setEnd(new DateTime(parserEnd.get()));
-                endDateTime = new DateTime(parserEnd.get());
-                editTaskDescriptor.setEnd(new DateTime(parserEnd.get()));
-            }
-
-            // additional checking for dateTime validity
-            if (startDateTime != null && endDateTime != null) {
-                if (startDateTime.compareTo(endDateTime) == -1) {
-                    throw new ParseException(EditTaskCommand.MESSAGE_DATE_TIME_TASK);
-                }
-            }
-
-            parseTagsForEdit(argMultimap.getAllValues(PREFIX_TAG)).ifPresent(editTaskDescriptor::setTags);
-        } catch (IllegalValueException ive) {
-            throw new ParseException(ive.getMessage(), ive);
-        }
-
-        if (!editTaskDescriptor.isAnyFieldEdited()) {
-            throw new ParseException(EditTaskCommand.MESSAGE_NOT_EDITED);
-        }
-
-        return new EditTaskCommand(index, editTaskDescriptor);
-    }
-
-    /**
-     * Parses {@code Collection<String> tags} into a {@code Set<Tag>} if {@code tags} is non-empty.
-     * If {@code tags} contain only one element which is an empty string, it will be parsed into a
-     * {@code Set<Tag>} containing zero tags.
-     */
-    private Optional<Set<Tag>> parseTagsForEdit(Collection<String> tags) throws IllegalValueException {
-        assert tags != null;
-
-        if (tags.isEmpty()) {
-            return Optional.empty();
-        }
-        Collection<String> tagSet = tags.size() == 1 && tags.contains("") ? Collections.emptySet() : tags;
-        return Optional.of(ParserUtil.parseTags(tagSet));
-    }
-
-}
-
-```
-###### \java\seedu\address\logic\parser\SelectTaskCommandParser.java
-``` java
-package seedu.address.logic.parser;
-
-import static seedu.address.commons.core.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
-
-import seedu.address.commons.core.index.Index;
-import seedu.address.commons.exceptions.IllegalValueException;
-import seedu.address.logic.commands.SelectTaskCommand;
-import seedu.address.logic.parser.exceptions.ParseException;
-
-/**
- * Parses input arguments and creates a new SelectCommand object
- */
-public class SelectTaskCommandParser implements Parser<SelectTaskCommand> {
-
-    /**
-     * Parses the given {@code String} of arguments in the context of the SelectCommand
-     * and returns an SelectCommand object for execution.
-     * @throws ParseException if the user input does not conform the expected format
-     */
-    public SelectTaskCommand parse(String args) throws ParseException {
-        try {
-            Index index = ParserUtil.parseIndex(args);
-            return new SelectTaskCommand(index);
-        } catch (IllegalValueException ive) {
-            throw new ParseException(
-                    String.format(MESSAGE_INVALID_COMMAND_FORMAT, SelectTaskCommand.MESSAGE_USAGE));
-        }
-    }
-}
-```
-###### \java\seedu\address\logic\parser\SetPriorityCommandParser.java
-``` java
-package seedu.address.logic.parser;
-
-import static java.util.Objects.requireNonNull;
-import static seedu.address.commons.core.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_PRIORITY;
-
-import seedu.address.commons.core.index.Index;
-import seedu.address.commons.exceptions.IllegalValueException;
-import seedu.address.logic.commands.SetPriorityCommand;
-import seedu.address.logic.parser.exceptions.ParseException;
-
-/**
- * Parses the given {@code String} of arguments in the context of the SetPriorityCommand
- * and returns an SetPriorityCommand object for execution.
- * @throws ParseException if the user input does not conform the expected format
- */
-public class SetPriorityCommandParser implements Parser<SetPriorityCommand> {
-    @Override
-    public SetPriorityCommand parse(String args) throws ParseException {
-        requireNonNull(args);
-        ArgumentMultimap argMultimap =
-                ArgumentTokenizer.tokenize(args, PREFIX_PRIORITY);
-        Index index;
-
-        try {
-            index = ParserUtil.parseIndex(argMultimap.getPreamble());
-        } catch (IllegalValueException ive) {
-            throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, SetPriorityCommand.MESSAGE_USAGE));
-        }
-
-        String priorityString = argMultimap.getValue(PREFIX_PRIORITY).orElse(null);
-        if (priorityString == null) {
-            throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, SetPriorityCommand.MESSAGE_USAGE));
-        }
-
-        Integer priority = Integer.parseInt(priorityString);
-
-        return new SetPriorityCommand(index, priority);
-    }
-}
-```
-###### \java\seedu\address\model\ReadOnlyTaskBook.java
-``` java
-package seedu.address.model;
-
-import javafx.collections.ObservableList;
-import seedu.address.model.tag.Tag;
-import seedu.address.model.task.ReadOnlyTask;
-
-/**
- * Unmodifiable view of an address book
- */
-public interface ReadOnlyTaskBook {
-
-    /**
-     * Returns an unmodifiable view of the persons list.
-     * This list will not contain any duplicate persons.
-     */
-    ObservableList<ReadOnlyTask> getTaskList();
-
-    /**
-     * Returns an unmodifiable view of the tags list.
-     * This list will not contain any duplicate tags.
-     */
-    ObservableList<Tag> getTagList();
-
-}
-```
-###### \java\seedu\address\model\task\DateTime.java
-``` java
-package seedu.address.model.task;
-
-import seedu.address.commons.exceptions.IllegalValueException;
-
-/**
- * Generic dateTime Class specially catered for our task (start time and end time)
- * we apply abstraction design pattern here and we check differently from how current public package does
- * Current format is very rigid, changing it to be more flexible will be a future enhancement
- */
-public class DateTime {
-    public static final String MESSAGE_DATE_TIME_FORMAT_CONSTRAINTS =
-            "The date time input should follow this format: dd-mm-YYYY "
-                    + "hh:mm[am/pm] day-month-year hour(12):minute am/pm";
-
-    public static final String MESSAGE_DATE_TIME_VALUE_CONSTRAINTS =
-            "The format is correct but the values are not: dd-mm-YYYY "
-                    + "hh:mm[am/pm] day-month-year hour(12):minute am/pm";
-
-    /**
-     * The data time input in our app currently have following rigit format
-     * dd-mm-YYYY hh:mm[am/pm] day-month-year hour:minute am/pm
-     */
-    public static final String DATE_TIME_VALIDATION_REGEX =
-            "\\d{2}-\\d{2}-\\d{4}\\s{1}\\d{2}:\\d{2}pm|\\d{2}-\\d{2}-\\d{4}\\s{1}\\d{2}:\\d{2}am";
-
-    private int day;
-    private int month;
-    private int year;
-    private int hour;
-    private int minute;
-    private String state;
-
-    /**
-     * Constructor and checker for the date time object
-     *
-     * @param dateTime
-     * @throws IllegalValueException
-     */
-    public DateTime(String dateTime) throws IllegalValueException {
-        //check the format:
-        if (!isValidDateTime(dateTime)) {
-            throw new IllegalValueException(MESSAGE_DATE_TIME_FORMAT_CONSTRAINTS);
-        }
-
-        //Now we can safely proceed to decompose the inputs
-        day = Integer.parseInt(dateTime.substring(0, 2));
-        month = Integer.parseInt(dateTime.substring(3, 5));
-        year = Integer.parseInt(dateTime.substring(6, 10));
-        hour = Integer.parseInt(dateTime.substring(11, 13));
-        minute = Integer.parseInt(dateTime.substring(14, 16));
-        state = dateTime.substring(16);
-
-        // value checking helper
-        boolean isLeapYear = ((year % 4 == 0) && (year % 100 != 0) || (year % 400 == 0));
-
-        //check the values:
-        if (month < 0 || month > 12) {
-            throw new IllegalValueException(MESSAGE_DATE_TIME_VALUE_CONSTRAINTS);
-        } else if (day < 0) {
-            throw new IllegalValueException(MESSAGE_DATE_TIME_VALUE_CONSTRAINTS);
-        } else {
-            if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) {
-                if (day > 31) {
-                    throw new IllegalValueException(MESSAGE_DATE_TIME_VALUE_CONSTRAINTS);
-                }
-            } else if (month == 2) {
-                if ((isLeapYear && day > 29) || (!isLeapYear && day > 28)) {
-                    throw new IllegalValueException(MESSAGE_DATE_TIME_VALUE_CONSTRAINTS);
-                }
-            } else {
-                if (day > 30) {
-                    throw new IllegalValueException(MESSAGE_DATE_TIME_VALUE_CONSTRAINTS);
-                }
-            }
-        }
-
-        if (hour < 0 || hour > 12) {
-            throw new IllegalValueException(MESSAGE_DATE_TIME_VALUE_CONSTRAINTS);
-        }
-
-        if (minute < 0 || minute > 60) {
-            throw new IllegalValueException(MESSAGE_DATE_TIME_VALUE_CONSTRAINTS);
-        }
-
-        if (!(state.equals("am") || state.equals("pm"))) {
-            throw new IllegalValueException(MESSAGE_DATE_TIME_VALUE_CONSTRAINTS);
-        }
-        // At this point, the values and formats are both correct.
-    }
-
-    public static boolean isValidDateTime(String test) {
-        return test.matches(DATE_TIME_VALIDATION_REGEX);
-    }
-
-    /**
-     * Convert our date time object to String
-     *
-     * @return
-     */
-    public String toString() {
-        String dayString = helperFormat(Integer.toString(day));
-        String monthString = helperFormat(Integer.toString(month));
-        String yearString = Integer.toString(year);
-        String hourString = helperFormat(Integer.toString(hour));
-        String minuteString = helperFormat(Integer.toString(minute));
-        return dayString + "-" + monthString + "-" + yearString + " " + hourString + ":" + minuteString + state;
-    }
-
-    /**
-     * Hashcode getter for our date time object
-     *
-     * @return the string representation's hash code
-     */
-    public int hashCode() {
-        return this.toString().hashCode();
-    }
-
-    /**
-     * Helper for making toString format correct
-     *
-     * @param input
-     * @return
-     */
-    private String helperFormat(String input) {
-        if (input.length() < 2) {
-            return "0" + input;
-        }
-        return input;
-    }
-
-    public int getDay () {
-        return day;
-    }
-
-    public int getMonth () {
-        return month;
-    }
-
-    public int getYear () {
-        return year;
-    }
-
-    public int getHour () {
-        return hour;
-    }
-
-    public int getMinute () {
-        return minute;
-    }
-
-    public String getState () {
-        return state;
-    }
-
-    /**
-     * comparing two date time object part by part
-     * @param others , a dateTime object
-     * @return 1 if the argument DateTime is bigger
-     */
-    public int compareTo(DateTime others) {
-        int othersDay = others.getDay();
-        int othersMonth = others.getMonth();
-        int othersYear = others.getYear();
-        int othersHour = others.getHour();
-        int othersMinute = others.getMinute();
-        String othersState = others.getState();
-        if (year < othersYear) {
-            return 1;
-        } else if (year > othersYear) {
-            return -1;
-        } else {
-            if (month < othersMonth) {
-                return 1;
-            } else if (month > othersMonth) {
-                return -1;
-            } else {
-                if (day < othersDay) {
-                    return 1;
-                } else if (day > othersDay) {
-                    return -1;
-                } else {
-                    // at this point, the two has exactly the same day
-                    if (state.equals("am") && othersState.equals("pm")) {
-                        return 1;
-                    } else if (state.equals("pm") && othersState.equals("am")) {
-                        return -1;
-                    } else {
-                        // same state, now we compare the time
-                        if (hour < othersHour) {
-                            return 1;
-                        } else if (hour > othersHour) {
-                            return -1;
-                        } else {
-                            if (minute < othersMinute) {
-                                return 1;
-                            } else if (minute > othersMinute) {
-                                return -1;
-                            } else {
-                                return 0;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Compare two DateTime object
-     * @param other , another DateTime object
-     * @return true if they are of the same object or of the same value
-     */
-    public boolean equals(Object other) {
-        return other == this // short circuit if same object
-                || (other instanceof DateTime // instanceof handles nulls
-                && (this.compareTo((DateTime) other) == 0));
-    }
-
-
-}
-```
-###### \java\seedu\address\model\task\exceptions\DuplicateTaskException.java
-``` java
-package seedu.address.model.task.exceptions;
-
-import seedu.address.commons.exceptions.DuplicateDataException;
-
-/**
- * This is an exception for duplicate tasks operations
- */
-public class DuplicateTaskException extends DuplicateDataException {
-
-    /**
-     * default constructor
-     */
-    public DuplicateTaskException() {
-        super("Operation would result in duplicate tasks");
-    }
-}
-```
-###### \java\seedu\address\model\task\exceptions\TaskNotFoundException.java
-``` java
-package seedu.address.model.task.exceptions;
-
-/**
- * For exception when a task not found (operation happens)
- */
-public class TaskNotFoundException extends Exception {
-}
-```
-###### \java\seedu\address\model\task\ReadOnlyTask.java
-``` java
-package seedu.address.model.task;
-
-import java.util.ArrayList;
-import java.util.Set;
-
-import javafx.beans.property.ObjectProperty;
-import seedu.address.model.tag.Tag;
-import seedu.address.model.tag.UniqueTagList;
-
-/**
- * A read-only immutable interface for a task in the taskBook.
- * Implementations should guarantee: details are present and not null, field values are validated.
- */
-public interface ReadOnlyTask {
-
-    // Content property
-    ObjectProperty<Name> nameProperty();
-    Name getName();
-    ObjectProperty<Description> descriptionProperty();
-    Description getDescription();
-    ObjectProperty<DateTime> startTimeProperty();
-    DateTime getStartDateTime();
-    ObjectProperty<DateTime> endTimeProperty();
-    DateTime getEndDateTime();
-
-    // functional property
-    ObjectProperty<Integer> priorityProperty();
-    Integer getPriority();
-    ObjectProperty<UniqueTagList> tagProperty();
-    Set<Tag> getTags();
-    ObjectProperty<Boolean> completeProperty();
-    Boolean getComplete();
-    ObjectProperty<Integer> idProperty();
-    Integer getId();
-    ObjectProperty<ArrayList<Integer>> peopleIdsProperty();
-    ArrayList<Integer> getPeopleIds();
-
-    /**
-     * Returns true if both have the same state. (interfaces cannot override .equals)
-     * state checking involves content property and functional property (priority, tag, and complete)
-     */
-    default boolean isSameStateAs(ReadOnlyTask other) {
-        return other == this // short circuit if same object
-                || (other != null // this is first to avoid NPE below
-                && other.getName().equals(this.getName()) // state checks here onwards
-                && other.getDescription().equals(this.getDescription())
-                && other.getStartDateTime().equals(this.getStartDateTime())
-                && other.getEndDateTime().equals(this.getEndDateTime())
-                && other.getComplete().equals(this.getComplete())
-                //&& other.getId().equals(this.getId())
-                && other.getPriority().equals(this.getPriority())
-                && other.getTags().equals(this.getTags()));
-    }
-
-    /**
-     * Formats the task as text, showing all contact details.
-     */
-    default String getAsText() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append(getName())
-                .append(" Description: ")
-                .append(getDescription())
-                .append(" Start: ")
-                .append(getStartDateTime())
-                .append(" End: ")
-                .append(getEndDateTime())
-                .append(" Complete: ")
-                .append(getComplete())
-                .append(" Priority: ")
-                .append(getPriority())
-                .append(" Tags: ");
-        getTags().forEach(builder::append);
-        return builder.toString();
-    }
-
-    /**
-     * return true if the underlying two tasks have the same content.
-     * @param other
-     * @return
-     */
-    boolean equals(Object other);
-
-}
-```
-###### \java\seedu\address\model\task\Task.java
+###### /java/seedu/address/model/task/Task.java
 ``` java
 package seedu.address.model.task;
 
@@ -1530,41 +371,7 @@ public class Task implements ReadOnlyTask {
 
 }
 ```
-###### \java\seedu\address\model\task\TaskNameContainsKeywordsPredicate.java
-``` java
-package seedu.address.model.task;
-
-import java.util.List;
-import java.util.function.Predicate;
-
-import seedu.address.commons.util.StringUtil;
-
-/**
- * Tests that a {@code ReadOnlyTask}'s {@code Name} matches any of the keywords given.
- */
-public class TaskNameContainsKeywordsPredicate implements Predicate<ReadOnlyTask> {
-    private final List<Name> keywords;
-
-    public TaskNameContainsKeywordsPredicate(List<Name> keywords) {
-        this.keywords = keywords;
-    }
-
-    @Override
-    public boolean test(ReadOnlyTask task) {
-        return keywords.stream()
-                .anyMatch(keyword -> StringUtil.containsWordIgnoreCase(task.getName().toString(), keyword.toString()));
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        return other == this // short circuit if same object
-                || (other instanceof TaskNameContainsKeywordsPredicate // instanceof handles nulls
-                && this.keywords.equals(((TaskNameContainsKeywordsPredicate) other).keywords)); // state check
-    }
-
-}
-```
-###### \java\seedu\address\model\task\UniqueTaskList.java
+###### /java/seedu/address/model/task/UniqueTaskList.java
 ``` java
 package seedu.address.model.task;
 
@@ -1613,7 +420,7 @@ public class UniqueTaskList implements Iterable<Task> {
     }
 
 ```
-###### \java\seedu\address\model\task\UniqueTaskList.java
+###### /java/seedu/address/model/task/UniqueTaskList.java
 ``` java
     /**
      * Removes the equivalent task from the list.
@@ -1666,7 +473,372 @@ public class UniqueTaskList implements Iterable<Task> {
     }
 }
 ```
-###### \java\seedu\address\model\TaskBook.java
+###### /java/seedu/address/model/task/exceptions/DuplicateTaskException.java
+``` java
+package seedu.address.model.task.exceptions;
+
+import seedu.address.commons.exceptions.DuplicateDataException;
+
+/**
+ * This is an exception for duplicate tasks operations
+ */
+public class DuplicateTaskException extends DuplicateDataException {
+
+    /**
+     * default constructor
+     */
+    public DuplicateTaskException() {
+        super("Operation would result in duplicate tasks");
+    }
+}
+```
+###### /java/seedu/address/model/task/exceptions/TaskNotFoundException.java
+``` java
+package seedu.address.model.task.exceptions;
+
+/**
+ * For exception when a task not found (operation happens)
+ */
+public class TaskNotFoundException extends Exception {
+}
+```
+###### /java/seedu/address/model/task/DateTime.java
+``` java
+package seedu.address.model.task;
+
+import seedu.address.commons.exceptions.IllegalValueException;
+
+/**
+ * Generic dateTime Class specially catered for our task (start time and end time)
+ * we apply abstraction design pattern here and we check differently from how current public package does
+ * Current format is very rigid, changing it to be more flexible will be a future enhancement
+ */
+public class DateTime {
+    public static final String MESSAGE_DATE_TIME_FORMAT_CONSTRAINTS =
+            "The date time input should follow this format: dd-mm-YYYY "
+                    + "hh:mm[am/pm] day-month-year hour(12):minute am/pm";
+
+    public static final String MESSAGE_DATE_TIME_VALUE_CONSTRAINTS =
+            "The format is correct but the values are not: dd-mm-YYYY "
+                    + "hh:mm[am/pm] day-month-year hour(12):minute am/pm";
+
+    /**
+     * The data time input in our app currently have following rigit format
+     * dd-mm-YYYY hh:mm[am/pm] day-month-year hour:minute am/pm
+     */
+    public static final String DATE_TIME_VALIDATION_REGEX =
+            "\\d{2}-\\d{2}-\\d{4}\\s{1}\\d{2}:\\d{2}pm|\\d{2}-\\d{2}-\\d{4}\\s{1}\\d{2}:\\d{2}am";
+
+    private int day;
+    private int month;
+    private int year;
+    private int hour;
+    private int minute;
+    private String state;
+
+    /**
+     * Constructor and checker for the date time object
+     *
+     * @param dateTime
+     * @throws IllegalValueException
+     */
+    public DateTime(String dateTime) throws IllegalValueException {
+        //check the format:
+        if (!isValidDateTime(dateTime)) {
+            throw new IllegalValueException(MESSAGE_DATE_TIME_FORMAT_CONSTRAINTS);
+        }
+
+        //Now we can safely proceed to decompose the inputs
+        day = Integer.parseInt(dateTime.substring(0, 2));
+        month = Integer.parseInt(dateTime.substring(3, 5));
+        year = Integer.parseInt(dateTime.substring(6, 10));
+        hour = Integer.parseInt(dateTime.substring(11, 13));
+        minute = Integer.parseInt(dateTime.substring(14, 16));
+        state = dateTime.substring(16);
+
+        // value checking helper
+        boolean isLeapYear = ((year % 4 == 0) && (year % 100 != 0) || (year % 400 == 0));
+
+        //check the values:
+        if (month < 0 || month > 12) {
+            throw new IllegalValueException(MESSAGE_DATE_TIME_VALUE_CONSTRAINTS);
+        } else if (day < 0) {
+            throw new IllegalValueException(MESSAGE_DATE_TIME_VALUE_CONSTRAINTS);
+        } else {
+            if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) {
+                if (day > 31) {
+                    throw new IllegalValueException(MESSAGE_DATE_TIME_VALUE_CONSTRAINTS);
+                }
+            } else if (month == 2) {
+                if ((isLeapYear && day > 29) || (!isLeapYear && day > 28)) {
+                    throw new IllegalValueException(MESSAGE_DATE_TIME_VALUE_CONSTRAINTS);
+                }
+            } else {
+                if (day > 30) {
+                    throw new IllegalValueException(MESSAGE_DATE_TIME_VALUE_CONSTRAINTS);
+                }
+            }
+        }
+
+        if (hour < 0 || hour > 12) {
+            throw new IllegalValueException(MESSAGE_DATE_TIME_VALUE_CONSTRAINTS);
+        }
+
+        if (minute < 0 || minute > 60) {
+            throw new IllegalValueException(MESSAGE_DATE_TIME_VALUE_CONSTRAINTS);
+        }
+
+        if (!(state.equals("am") || state.equals("pm"))) {
+            throw new IllegalValueException(MESSAGE_DATE_TIME_VALUE_CONSTRAINTS);
+        }
+        // At this point, the values and formats are both correct.
+    }
+
+    public static boolean isValidDateTime(String test) {
+        return test.matches(DATE_TIME_VALIDATION_REGEX);
+    }
+
+    /**
+     * Convert our date time object to String
+     *
+     * @return
+     */
+    public String toString() {
+        String dayString = helperFormat(Integer.toString(day));
+        String monthString = helperFormat(Integer.toString(month));
+        String yearString = Integer.toString(year);
+        String hourString = helperFormat(Integer.toString(hour));
+        String minuteString = helperFormat(Integer.toString(minute));
+        return dayString + "-" + monthString + "-" + yearString + " " + hourString + ":" + minuteString + state;
+    }
+
+    /**
+     * Hashcode getter for our date time object
+     *
+     * @return the string representation's hash code
+     */
+    public int hashCode() {
+        return this.toString().hashCode();
+    }
+
+    /**
+     * Helper for making toString format correct
+     *
+     * @param input
+     * @return
+     */
+    private String helperFormat(String input) {
+        if (input.length() < 2) {
+            return "0" + input;
+        }
+        return input;
+    }
+
+    public int getDay () {
+        return day;
+    }
+
+    public int getMonth () {
+        return month;
+    }
+
+    public int getYear () {
+        return year;
+    }
+
+    public int getHour () {
+        return hour;
+    }
+
+    public int getMinute () {
+        return minute;
+    }
+
+    public String getState () {
+        return state;
+    }
+
+    /**
+     * comparing two date time object part by part
+     * @param others , a dateTime object
+     * @return 1 if the argument DateTime is bigger
+     */
+    public int compareTo(DateTime others) {
+        int othersDay = others.getDay();
+        int othersMonth = others.getMonth();
+        int othersYear = others.getYear();
+        int othersHour = others.getHour();
+        int othersMinute = others.getMinute();
+        String othersState = others.getState();
+        if (year < othersYear) {
+            return 1;
+        } else if (year > othersYear) {
+            return -1;
+        } else {
+            if (month < othersMonth) {
+                return 1;
+            } else if (month > othersMonth) {
+                return -1;
+            } else {
+                if (day < othersDay) {
+                    return 1;
+                } else if (day > othersDay) {
+                    return -1;
+                } else {
+                    // at this point, the two has exactly the same day
+                    if (state.equals("am") && othersState.equals("pm")) {
+                        return 1;
+                    } else if (state.equals("pm") && othersState.equals("am")) {
+                        return -1;
+                    } else {
+                        // same state, now we compare the time
+                        if (hour < othersHour) {
+                            return 1;
+                        } else if (hour > othersHour) {
+                            return -1;
+                        } else {
+                            if (minute < othersMinute) {
+                                return 1;
+                            } else if (minute > othersMinute) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Compare two DateTime object
+     * @param other , another DateTime object
+     * @return true if they are of the same object or of the same value
+     */
+    public boolean equals(Object other) {
+        return other == this // short circuit if same object
+                || (other instanceof DateTime // instanceof handles nulls
+                && (this.compareTo((DateTime) other) == 0));
+    }
+
+
+}
+```
+###### /java/seedu/address/model/task/ReadOnlyTask.java
+``` java
+package seedu.address.model.task;
+
+import java.util.ArrayList;
+import java.util.Set;
+
+import javafx.beans.property.ObjectProperty;
+import seedu.address.model.tag.Tag;
+import seedu.address.model.tag.UniqueTagList;
+
+/**
+ * A read-only immutable interface for a task in the taskBook.
+ * Implementations should guarantee: details are present and not null, field values are validated.
+ */
+public interface ReadOnlyTask {
+
+    // Content property
+    ObjectProperty<Name> nameProperty();
+    Name getName();
+    ObjectProperty<Description> descriptionProperty();
+    Description getDescription();
+    ObjectProperty<DateTime> startTimeProperty();
+    DateTime getStartDateTime();
+    ObjectProperty<DateTime> endTimeProperty();
+    DateTime getEndDateTime();
+
+    // functional property
+    ObjectProperty<Integer> priorityProperty();
+    Integer getPriority();
+    ObjectProperty<UniqueTagList> tagProperty();
+    Set<Tag> getTags();
+    ObjectProperty<Boolean> completeProperty();
+    Boolean getComplete();
+    ObjectProperty<Integer> idProperty();
+    Integer getId();
+    ObjectProperty<ArrayList<Integer>> peopleIdsProperty();
+    ArrayList<Integer> getPeopleIds();
+
+    /**
+     * Returns true if both have the same state. (interfaces cannot override .equals)
+     * state checking involves content property and functional property (priority, tag, and complete)
+     */
+    default boolean isSameStateAs(ReadOnlyTask other) {
+        return other == this // short circuit if same object
+                || (other != null // this is first to avoid NPE below
+                && other.getName().equals(this.getName()) // state checks here onwards
+                && other.getDescription().equals(this.getDescription())
+                && other.getStartDateTime().equals(this.getStartDateTime())
+                && other.getEndDateTime().equals(this.getEndDateTime())
+                && other.getComplete().equals(this.getComplete())
+                //&& other.getId().equals(this.getId())
+                && other.getPriority().equals(this.getPriority())
+                && other.getTags().equals(this.getTags()));
+    }
+
+    /**
+     * Formats the task as text, showing all contact details.
+     */
+    default String getAsText() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append(getName())
+                .append(" Description: ")
+                .append(getDescription())
+                .append(" Start: ")
+                .append(getStartDateTime())
+                .append(" End: ")
+                .append(getEndDateTime())
+                .append(" Complete: ")
+                .append(getComplete())
+                .append(" Priority: ")
+                .append(getPriority())
+                .append(" Tags: ");
+        getTags().forEach(builder::append);
+        return builder.toString();
+    }
+
+    /**
+     * return true if the underlying two tasks have the same content.
+     * @param other
+     * @return
+     */
+    boolean equals(Object other);
+
+}
+```
+###### /java/seedu/address/model/ReadOnlyTaskBook.java
+``` java
+package seedu.address.model;
+
+import javafx.collections.ObservableList;
+import seedu.address.model.tag.Tag;
+import seedu.address.model.task.ReadOnlyTask;
+
+/**
+ * Unmodifiable view of an address book
+ */
+public interface ReadOnlyTaskBook {
+
+    /**
+     * Returns an unmodifiable view of the persons list.
+     * This list will not contain any duplicate persons.
+     */
+    ObservableList<ReadOnlyTask> getTaskList();
+
+    /**
+     * Returns an unmodifiable view of the tags list.
+     * This list will not contain any duplicate tags.
+     */
+    ObservableList<Tag> getTagList();
+
+}
+```
+###### /java/seedu/address/model/TaskBook.java
 ``` java
 package seedu.address.model;
 
@@ -1764,7 +936,7 @@ public class TaskBook implements ReadOnlyTaskBook {
     }
 
 ```
-###### \java\seedu\address\model\TaskBook.java
+###### /java/seedu/address/model/TaskBook.java
 ``` java
     /**
      * Replaces the given task {@code target} in the list with {@code editedReadOnlyTask}.
@@ -1902,56 +1074,811 @@ public class TaskBook implements ReadOnlyTaskBook {
     }
 }
 ```
-###### \java\seedu\address\storage\TaskBookStorage.java
+###### /java/seedu/address/logic/parser/DeleteTaskCommandParser.java
 ``` java
-package seedu.address.storage;
+package seedu.address.logic.parser;
 
-import java.io.IOException;
-import java.util.Optional;
+import static seedu.address.commons.core.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 
-import seedu.address.commons.exceptions.DataConversionException;
-import seedu.address.model.ReadOnlyTaskBook;
+import seedu.address.commons.core.index.Index;
+import seedu.address.commons.exceptions.IllegalValueException;
+import seedu.address.logic.commands.DeleteTaskCommand;
+import seedu.address.logic.parser.exceptions.ParseException;
 
 /**
- * Represents a storage for task class
+ * Parses input arguments and creates a new DeleteCommand object
  */
-public interface TaskBookStorage {
+public class DeleteTaskCommandParser implements Parser<DeleteTaskCommand> {
 
     /**
-     * Returns the file path of the data file.
+     * Parses the given {@code String} of arguments in the context of the DeleteTaskCommand
+     * and returns an DeleteTaskCommand object for execution.
+     * @throws ParseException if the user input does not conform the expected format
      */
-    String getTaskBookFilePath();
-
-    /**
-     * Returns AddressBook data as a {@link ReadOnlyTaskBook}.
-     *   Returns {@code Optional.empty()} if storage file is not found.
-     * @throws DataConversionException if the data in storage is not in the expected format.
-     * @throws IOException if there was any problem when reading from the storage.
-     */
-    Optional<ReadOnlyTaskBook> readTaskBook() throws DataConversionException, IOException;
-
-    /**
-     * @see #getTaskBookFilePath()
-     */
-    Optional<ReadOnlyTaskBook> readTaskBook(String filePath) throws DataConversionException, IOException;
-
-    /**
-     * Saves the given {@link ReadOnlyTaskBook} to the storage.
-     * @param taskBook cannot be null.
-     * @throws IOException if there was any problem writing to the file.
-     */
-    void saveTaskBook(ReadOnlyTaskBook taskBook) throws IOException;
-
-    /**
-     * @see #saveTaskBook(ReadOnlyTaskBook)
-     */
-    void saveTaskBook(ReadOnlyTaskBook taskBook, String filePath) throws IOException;
-
-    void backupTaskBook(ReadOnlyTaskBook taskBook) throws IOException;
+    public DeleteTaskCommand parse(String args) throws ParseException {
+        try {
+            Index index = ParserUtil.parseIndex(args);
+            return new DeleteTaskCommand(index);
+        } catch (IllegalValueException ive) {
+            throw new ParseException(
+                    String.format(MESSAGE_INVALID_COMMAND_FORMAT, DeleteTaskCommand.MESSAGE_USAGE));
+        }
+    }
 
 }
 ```
-###### \java\seedu\address\storage\XmlAdaptedTask.java
+###### /java/seedu/address/logic/parser/SetPriorityCommandParser.java
+``` java
+package seedu.address.logic.parser;
+
+import static java.util.Objects.requireNonNull;
+import static seedu.address.commons.core.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_PRIORITY;
+
+import seedu.address.commons.core.index.Index;
+import seedu.address.commons.exceptions.IllegalValueException;
+import seedu.address.logic.commands.SetPriorityCommand;
+import seedu.address.logic.parser.exceptions.ParseException;
+
+/**
+ * Parses the given {@code String} of arguments in the context of the SetPriorityCommand
+ * and returns an SetPriorityCommand object for execution.
+ * @throws ParseException if the user input does not conform the expected format
+ */
+public class SetPriorityCommandParser implements Parser<SetPriorityCommand> {
+    @Override
+    public SetPriorityCommand parse(String args) throws ParseException {
+        requireNonNull(args);
+        ArgumentMultimap argMultimap =
+                ArgumentTokenizer.tokenize(args, PREFIX_PRIORITY);
+        Index index;
+
+        try {
+            index = ParserUtil.parseIndex(argMultimap.getPreamble());
+        } catch (IllegalValueException ive) {
+            throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, SetPriorityCommand.MESSAGE_USAGE));
+        }
+
+        String priorityString = argMultimap.getValue(PREFIX_PRIORITY).orElse(null);
+        if (priorityString == null) {
+            throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, SetPriorityCommand.MESSAGE_USAGE));
+        }
+
+        Integer priority = Integer.parseInt(priorityString);
+
+        return new SetPriorityCommand(index, priority);
+    }
+}
+```
+###### /java/seedu/address/logic/parser/AddTaskCommandParser.java
+``` java
+package seedu.address.logic.parser;
+
+import static seedu.address.commons.core.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_DESCRIPTION;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_END_DATE_TIME;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_PRIORITY;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_START_DATE_TIME;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
+
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import seedu.address.commons.exceptions.IllegalValueException;
+import seedu.address.logic.commands.AddTaskCommand;
+import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.tag.Tag;
+import seedu.address.model.task.DateTime;
+import seedu.address.model.task.Description;
+import seedu.address.model.task.Name;
+import seedu.address.model.task.ReadOnlyTask;
+import seedu.address.model.task.Task;
+
+/**
+ * A parser class for addTask Command
+ */
+public class AddTaskCommandParser implements Parser<AddTaskCommand> {
+
+    /**
+     * Parses the given {@code String} of arguments in the context of the AddTask Command
+     * and returns an AddTask Command object for execution.
+     * @throws ParseException if the user input does not conform the expected format
+     */
+    public AddTaskCommand parse(String args) throws ParseException {
+        ArgumentMultimap argMultimap =
+                ArgumentTokenizer.tokenize(args, PREFIX_NAME, PREFIX_DESCRIPTION,
+                        PREFIX_START_DATE_TIME, PREFIX_END_DATE_TIME, PREFIX_PRIORITY, PREFIX_TAG);
+
+        if (!arePrefixesPresent(argMultimap, PREFIX_NAME, PREFIX_DESCRIPTION,
+                PREFIX_START_DATE_TIME, PREFIX_END_DATE_TIME)) {
+            throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddTaskCommand.MESSAGE_USAGE));
+        }
+
+        try {
+            Name name = new Name(ParserUtil.parseString(argMultimap.getValue(PREFIX_NAME)).get());
+            Description description =
+                    new Description(ParserUtil.parseString(argMultimap.getValue(PREFIX_DESCRIPTION)).get());
+            DateTime startDateTime =
+                    new DateTime(ParserUtil.parseString(argMultimap.getValue(PREFIX_START_DATE_TIME)).get());
+            DateTime endDateTime =
+                    new DateTime(ParserUtil.parseString(argMultimap.getValue(PREFIX_END_DATE_TIME)).get());
+
+            if (startDateTime.compareTo(endDateTime) == -1) {
+                throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddTaskCommand.MESSAGE_USAGE));
+            }
+
+            Optional<Integer> priority = ParserUtil.parseInteger(argMultimap.getValue(PREFIX_PRIORITY));
+
+            Set<Tag> tagList = ParserUtil.parseTags(argMultimap.getAllValues(PREFIX_TAG));
+            Boolean complete = false;
+            ReadOnlyTask task;
+            // Renew the task object with the priority parameter specially set if given
+            if (priority.isPresent()) {
+                Integer priorityValue = priority.get();
+                task = new Task(name, description, startDateTime, endDateTime, tagList, complete, priorityValue);
+            } else {
+                task = new Task(name, description, startDateTime, endDateTime, tagList, complete);
+            }
+
+            return new AddTaskCommand(task);
+        } catch (IllegalValueException ive) {
+            throw new ParseException(ive.getMessage(), ive);
+        }
+    }
+
+    /**
+     * Returns true if none of the prefixes contains empty {@code Optional} values in the given
+     * {@code ArgumentMultimap}.
+     */
+    private static boolean arePrefixesPresent(ArgumentMultimap argumentMultimap, Prefix... prefixes) {
+        return Stream.of(prefixes).allMatch(prefix -> argumentMultimap.getValue(prefix).isPresent());
+    }
+}
+```
+###### /java/seedu/address/logic/parser/EditTaskCommandParser.java
+``` java
+    /**
+     * Parses the given {@code String} of arguments in the context of the EditTaskCommand
+     * and returns an EditTaskCommand object for execution.
+     * @throws ParseException if the user input does not conform the expected format
+     */
+    public EditTaskCommand parse(String args) throws ParseException {
+        requireNonNull(args);
+        ArgumentMultimap argMultimap =
+                ArgumentTokenizer.tokenize(args, PREFIX_NAME, PREFIX_DESCRIPTION, PREFIX_START_DATE_TIME,
+                        PREFIX_END_DATE_TIME, PREFIX_TAG);
+
+        Index index;
+
+        try {
+            index = ParserUtil.parseIndex(argMultimap.getPreamble());
+        } catch (IllegalValueException ive) {
+            throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, EditTaskCommand.MESSAGE_USAGE));
+        }
+
+        EditTaskDescriptor editTaskDescriptor = new EditTaskDescriptor();
+        try {
+            Optional<String> parserName = ParserUtil.parseString(argMultimap.getValue(PREFIX_NAME));
+            if (parserName.isPresent()) {
+                editTaskDescriptor.setName(new Name(parserName.get()));
+            }
+            Optional<String> parserDescription = ParserUtil.parseString(argMultimap.getValue(PREFIX_DESCRIPTION));
+            if (parserDescription.isPresent()) {
+                editTaskDescriptor.setDescription(new Description(parserDescription.get()));
+            }
+
+            Optional<String> parserStart = ParserUtil.parseString(argMultimap.getValue(PREFIX_START_DATE_TIME));
+            DateTime startDateTime = null;
+            if (parserStart.isPresent()) {
+                //editTaskDescriptor.setStart(new DateTime(parserStart.get()));
+                startDateTime = new DateTime(parserStart.get());
+                editTaskDescriptor.setStart(new DateTime(parserStart.get()));
+            }
+
+            Optional<String> parserEnd = ParserUtil.parseString(argMultimap.getValue(PREFIX_END_DATE_TIME));
+            DateTime endDateTime = null;
+            if (parserEnd.isPresent()) {
+                //editTaskDescriptor.setEnd(new DateTime(parserEnd.get()));
+                endDateTime = new DateTime(parserEnd.get());
+                editTaskDescriptor.setEnd(new DateTime(parserEnd.get()));
+            }
+
+            // additional checking for dateTime validity
+            if (startDateTime != null && endDateTime != null) {
+                if (startDateTime.compareTo(endDateTime) == -1) {
+                    throw new ParseException(EditTaskCommand.MESSAGE_DATE_TIME_TASK);
+                }
+            }
+
+            parseTagsForEdit(argMultimap.getAllValues(PREFIX_TAG)).ifPresent(editTaskDescriptor::setTags);
+        } catch (IllegalValueException ive) {
+            throw new ParseException(ive.getMessage(), ive);
+        }
+
+        if (!editTaskDescriptor.isAnyFieldEdited()) {
+            throw new ParseException(EditTaskCommand.MESSAGE_NOT_EDITED);
+        }
+
+        return new EditTaskCommand(index, editTaskDescriptor);
+    }
+
+    /**
+     * Parses {@code Collection<String> tags} into a {@code Set<Tag>} if {@code tags} is non-empty.
+     * If {@code tags} contain only one element which is an empty string, it will be parsed into a
+     * {@code Set<Tag>} containing zero tags.
+     */
+    private Optional<Set<Tag>> parseTagsForEdit(Collection<String> tags) throws IllegalValueException {
+        assert tags != null;
+
+        if (tags.isEmpty()) {
+            return Optional.empty();
+        }
+        Collection<String> tagSet = tags.size() == 1 && tags.contains("") ? Collections.emptySet() : tags;
+        return Optional.of(ParserUtil.parseTags(tagSet));
+    }
+
+}
+
+```
+###### /java/seedu/address/logic/parser/SelectTaskCommandParser.java
+``` java
+package seedu.address.logic.parser;
+
+import static seedu.address.commons.core.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
+
+import seedu.address.commons.core.index.Index;
+import seedu.address.commons.exceptions.IllegalValueException;
+import seedu.address.logic.commands.SelectTaskCommand;
+import seedu.address.logic.parser.exceptions.ParseException;
+
+/**
+ * Parses input arguments and creates a new SelectCommand object
+ */
+public class SelectTaskCommandParser implements Parser<SelectTaskCommand> {
+
+    /**
+     * Parses the given {@code String} of arguments in the context of the SelectCommand
+     * and returns an SelectCommand object for execution.
+     * @throws ParseException if the user input does not conform the expected format
+     */
+    public SelectTaskCommand parse(String args) throws ParseException {
+        try {
+            Index index = ParserUtil.parseIndex(args);
+            return new SelectTaskCommand(index);
+        } catch (IllegalValueException ive) {
+            throw new ParseException(
+                    String.format(MESSAGE_INVALID_COMMAND_FORMAT, SelectTaskCommand.MESSAGE_USAGE));
+        }
+    }
+}
+```
+###### /java/seedu/address/logic/commands/AddTaskCommand.java
+``` java
+package seedu.address.logic.commands;
+
+import static java.util.Objects.requireNonNull;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_DESCRIPTION;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_END_DATE_TIME;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_PRIORITY;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_START_DATE_TIME;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
+
+import seedu.address.logic.commands.exceptions.CommandException;
+import seedu.address.model.task.ReadOnlyTask;
+import seedu.address.model.task.Task;
+import seedu.address.model.task.exceptions.DuplicateTaskException;
+
+/**
+ * Adds a person to the address book.
+ */
+public class AddTaskCommand extends UndoableCommand {
+
+    public static final String COMMAND_WORD = "addTask";
+    public static final String COMMAND_ALIAS = "at";
+
+    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Adds a task to the task book. "
+            + "Parameters: "
+            + PREFIX_NAME + "NAME "
+            + PREFIX_DESCRIPTION + "Description "
+            + PREFIX_START_DATE_TIME + "START TIME "
+            + PREFIX_END_DATE_TIME + "END TIME "
+            + PREFIX_PRIORITY + "INTEGER[1~5] "
+            + "[" + PREFIX_TAG + "TAG]...\n"
+            + "Example: " + COMMAND_WORD + " "
+            + PREFIX_NAME + "picnic "
+            + PREFIX_DESCRIPTION + "have fun at Botanic Garden "
+            + PREFIX_START_DATE_TIME + "26-11-2017 11:00am "
+            + PREFIX_END_DATE_TIME + "26-11-2017 12:00am "
+            + PREFIX_PRIORITY + "3 "
+            + PREFIX_TAG + "friends ";
+
+    public static final String MESSAGE_SUCCESS = "New task added: %1$s";
+    public static final String MESSAGE_DUPLICATE_TASK = "This task already exists in the task book";
+
+    private final Task toAdd;
+
+    /**
+     * Creates an AddCommand to add the specified {@code ReadOnlyPerson}
+     */
+    public AddTaskCommand(ReadOnlyTask task) {
+        toAdd = new Task(task);
+    }
+
+    @Override
+    public CommandResult executeUndoableCommand() throws CommandException {
+        requireNonNull(model);
+        try {
+            model.addTask(toAdd);
+            return new CommandResult(String.format(MESSAGE_SUCCESS, toAdd));
+        } catch (DuplicateTaskException e) {
+            throw new CommandException(MESSAGE_DUPLICATE_TASK);
+        }
+
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other == this // short circuit if same object
+                || (other instanceof AddTaskCommand // instanceof handles nulls
+                && toAdd.equals(((AddTaskCommand) other).toAdd));
+    }
+}
+```
+###### /java/seedu/address/logic/commands/ClearTaskCommand.java
+``` java
+package seedu.address.logic.commands;
+
+import static java.util.Objects.requireNonNull;
+
+import seedu.address.model.TaskBook;
+
+/**
+ * Clears the address book.
+ */
+public class ClearTaskCommand extends UndoableCommand {
+
+    public static final String COMMAND_WORD = "clearTask";
+    public static final String COMMAND_ALIAS = "ct";
+    public static final String MESSAGE_SUCCESS = "Task book has been cleared!";
+
+
+    @Override
+    public CommandResult executeUndoableCommand() {
+        requireNonNull(model);
+        model.resetData(new TaskBook());
+        return new CommandResult(MESSAGE_SUCCESS);
+    }
+}
+```
+###### /java/seedu/address/logic/commands/EditTaskCommand.java
+``` java
+    @Override
+    public CommandResult executeUndoableCommand() throws CommandException {
+        List<ReadOnlyTask> lastShownList = model.getSortedTaskList();
+
+        if (index.getZeroBased() >= lastShownList.size()) {
+            throw new CommandException(Messages.MESSAGE_INVALID_TASK_DISPLAYED_INDEX);
+        }
+
+        ReadOnlyTask taskToEdit = lastShownList.get(index.getZeroBased());
+
+        Task editedTask = null;
+        try {
+            editedTask = createEditedTask(taskToEdit, editTaskDescriptor);
+        } catch (IllegalValueException e) {
+            throw new CommandException(MESSAGE_DATE_TIME_TASK);
+        }
+
+        try {
+            model.updateTask(taskToEdit, editedTask);
+        } catch (DuplicateTaskException dpe) {
+            throw new CommandException(MESSAGE_DUPLICATE_TASK);
+        } catch (TaskNotFoundException tnfe) {
+            throw new AssertionError("The target task cannot be missing");
+        }
+        model.updateFilteredTaskList(PREDICATE_SHOW_ALL_TASKS);
+        return new CommandResult(String.format(MESSAGE_EDIT_TASK_SUCCESS, editedTask));
+    }
+
+    /**
+     * Creates and returns a {@code Task} with the details of {@code taskToEdit}
+     * edited with {@code editTaskDescriptor}.
+     */
+    private static Task createEditedTask(ReadOnlyTask taskToEdit,
+                                             EditTaskDescriptor editTaskDescriptor) throws IllegalValueException {
+        assert taskToEdit != null;
+
+        Name updatedTaskName = editTaskDescriptor.getName().orElse(taskToEdit.getName());
+        Description updatedDescription = editTaskDescriptor.getDescription().orElse(taskToEdit.getDescription());
+        DateTime updatedStartDateTime = editTaskDescriptor.getStartDateTime().orElse(taskToEdit.getStartDateTime());
+        DateTime updatedEndDateTime = editTaskDescriptor.getEndDateTime().orElse(taskToEdit.getEndDateTime());
+        if (updatedStartDateTime.compareTo(updatedEndDateTime) == -1) {
+            throw new IllegalValueException(MESSAGE_DATE_TIME_TASK);
+        }
+        Set<Tag> updatedTags = editTaskDescriptor.getTags().orElse(taskToEdit.getTags());
+        Boolean updateComplete = editTaskDescriptor.getComplete().orElse(taskToEdit.getComplete());
+        //Remark updatedRemark = taskToEdit.getRemark(); // edit command does not allow editing remarks
+        Integer originalPriority = taskToEdit.getPriority(); // edit command is not used to update priority
+        Integer id = taskToEdit.getId();
+        ArrayList<Integer> peopleIds = taskToEdit.getPeopleIds();
+        return new Task(updatedTaskName, updatedDescription, updatedStartDateTime, updatedEndDateTime,
+                updatedTags, updateComplete, originalPriority, id, peopleIds);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        // short circuit if same object
+        if (other == this) {
+            return true;
+        }
+
+        // instanceof handles nulls
+        if (!(other instanceof EditTaskCommand)) {
+            return false;
+        }
+
+        // state check
+        EditTaskCommand e = (EditTaskCommand) other;
+        return index.equals(e.index)
+                && editTaskDescriptor.equals(e.editTaskDescriptor);
+    }
+
+    /**
+     * Stores the details to edit the task with. Each non-empty field value will replace the
+     * corresponding field value of the task.
+     */
+    public static class EditTaskDescriptor {
+        private Name taskName;
+        private Description description;
+        private DateTime start;
+        private DateTime end;
+        private Set<Tag> tags;
+        private Boolean complete;
+
+        public EditTaskDescriptor() {}
+
+        public EditTaskDescriptor(EditTaskDescriptor toCopy) {
+            this.taskName = toCopy.taskName;
+            this.description = toCopy.description;
+            this.start = toCopy.start;
+            this.end = toCopy.end;
+            this.tags = toCopy.tags;
+            this.complete = toCopy.complete;
+        }
+
+        /**
+         * Returns true if at least one field is edited.
+         */
+        public boolean isAnyFieldEdited() {
+            return CollectionUtil.isAnyNonNull(this.taskName, this.description, this.start, this.end,
+                    this.tags, this.complete);
+        }
+
+        public void setName(Name taskName) {
+            this.taskName = taskName;
+        }
+
+        public Optional<Name> getName() {
+            return Optional.ofNullable(taskName);
+        }
+
+        public void setDescription(Description description) {
+            this.description = description;
+        }
+
+        public Optional<Description> getDescription() {
+            return Optional.ofNullable(description);
+        }
+
+        public void setStart(DateTime start) {
+            this.start = start;
+        }
+
+        public Optional<DateTime> getStartDateTime() {
+            return Optional.ofNullable(start);
+        }
+
+        public void setEnd(DateTime end) {
+            this.end = end;
+        }
+
+        public Optional<DateTime> getEndDateTime() {
+            return Optional.ofNullable(end);
+        }
+
+        public void setTags(Set<Tag> tags) {
+            this.tags = tags;
+        }
+
+        public Optional<Set<Tag>> getTags() {
+            return Optional.ofNullable(tags);
+        }
+
+        public void setComplete(Boolean complete) {
+            this.complete = complete;
+        }
+
+        public Optional<Boolean> getComplete() {
+            return Optional.ofNullable(complete);
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            // short circuit if same object
+            if (other == this) {
+                return true;
+            }
+
+            // instanceof handles nulls
+            if (!(other instanceof EditTaskDescriptor)) {
+                return false;
+            }
+
+            // state check
+            EditTaskDescriptor e = (EditTaskDescriptor) other;
+
+            return getName().equals(e.getName())
+                    && getDescription().equals(e.getDescription())
+                    && getStartDateTime().equals(e.getStartDateTime())
+                    && getEndDateTime().equals(e.getEndDateTime())
+                    && getTags().equals(e.getTags())
+                    && getComplete().equals(e.getComplete());
+        }
+    }
+}
+
+```
+###### /java/seedu/address/logic/commands/SelectTaskCommand.java
+``` java
+package seedu.address.logic.commands;
+
+import java.util.List;
+
+import seedu.address.commons.core.EventsCenter;
+import seedu.address.commons.core.Messages;
+import seedu.address.commons.core.index.Index;
+import seedu.address.commons.events.ui.JumpToTaskListRequestEvent;
+import seedu.address.logic.commands.exceptions.CommandException;
+import seedu.address.model.task.ReadOnlyTask;
+
+/**
+ * Selects a task identified using it's last displayed index from the task book.
+ */
+public class SelectTaskCommand extends Command {
+
+    public static final String COMMAND_WORD = "selectTask";
+    public static final String COMMAND_ALIAS = "st";
+
+    public static final String MESSAGE_USAGE = COMMAND_WORD
+            + ": Selects the task identified by the index number used in the last task listing.\n"
+            + "Parameters: INDEX (must be a positive integer)\n"
+            + "Example: " + COMMAND_WORD + " 1";
+
+    public static final String MESSAGE_SELECT_TASK_SUCCESS = "Selected Task: %1$s";
+
+    private final Index targetIndex;
+
+    public SelectTaskCommand(Index targetIndex) {
+        this.targetIndex = targetIndex;
+    }
+
+    @Override
+    public CommandResult execute() throws CommandException {
+
+        List<ReadOnlyTask> lastShownList = model.getSortedTaskList();
+
+        if (targetIndex.getZeroBased() >= lastShownList.size()) {
+            throw new CommandException(Messages.MESSAGE_INVALID_TASK_DISPLAYED_INDEX);
+        }
+
+        EventsCenter.getInstance().post(new JumpToTaskListRequestEvent(targetIndex));
+        return new CommandResult(String.format(MESSAGE_SELECT_TASK_SUCCESS, targetIndex.getOneBased()));
+
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other == this // short circuit if same object
+                || (other instanceof SelectTaskCommand // instanceof handles nulls
+                && this.targetIndex.equals(((SelectTaskCommand) other).targetIndex)); // state check
+    }
+}
+```
+###### /java/seedu/address/logic/commands/TaskByPriorityCommand.java
+``` java
+package seedu.address.logic.commands;
+
+/**
+ * Task sorted by priority value from 1 to 5
+ */
+public class TaskByPriorityCommand extends Command {
+
+    public static final String COMMAND_WORD = "taskByPriority";
+    public static final String COMMAND_ALIAS = "tbp";
+
+    public static final String MESSAGE_SUCCESS = "Tasks have been sorted by priority.";
+
+
+    @Override
+    public CommandResult execute() {
+        model.taskByPriority();
+        return new CommandResult(MESSAGE_SUCCESS);
+    }
+
+}
+```
+###### /java/seedu/address/logic/commands/DeleteTaskCommand.java
+``` java
+package seedu.address.logic.commands;
+
+import java.util.List;
+
+import seedu.address.commons.core.Messages;
+import seedu.address.commons.core.index.Index;
+import seedu.address.logic.commands.exceptions.CommandException;
+import seedu.address.model.task.ReadOnlyTask;
+import seedu.address.model.task.exceptions.TaskNotFoundException;
+
+/**
+ * Deletes a task identified using it's last displayed index from the address book.
+ */
+public class DeleteTaskCommand extends UndoableCommand {
+
+    public static final String COMMAND_WORD = "deleteTask";
+    public static final String COMMAND_ALIAS = "dt";
+
+    public static final String MESSAGE_USAGE = COMMAND_WORD
+            + ": Deletes the task identified by the index number used in the last task listing.\n"
+            + "Parameters: INDEX (must be a positive integer)\n"
+            + "Example: " + COMMAND_WORD + " 1";
+
+    public static final String MESSAGE_DELETE_TASK_SUCCESS = "Deleted Task: %1$s";
+
+    private final Index targetIndex;
+
+    public DeleteTaskCommand(Index targetIndex) {
+        this.targetIndex = targetIndex;
+    }
+
+
+    @Override
+    public CommandResult executeUndoableCommand() throws CommandException {
+
+        List<ReadOnlyTask> lastShownList = model.getSortedTaskList();
+
+        if (targetIndex.getZeroBased() >= lastShownList.size()) {
+            throw new CommandException(Messages.MESSAGE_INVALID_TASK_DISPLAYED_INDEX);
+        }
+
+        ReadOnlyTask taskToDelete = lastShownList.get(targetIndex.getZeroBased());
+
+        try {
+            model.deleteTask(taskToDelete);
+        } catch (TaskNotFoundException tnfe) {
+            assert false : "The target task cannot be missing";
+        }
+
+        return new CommandResult(String.format(MESSAGE_DELETE_TASK_SUCCESS, taskToDelete));
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other == this // short circuit if same object
+                || (other instanceof DeleteTaskCommand // instanceof handles nulls
+                && this.targetIndex.equals(((DeleteTaskCommand) other).targetIndex)); // state check
+    }
+}
+```
+###### /java/seedu/address/logic/commands/SetPriorityCommand.java
+``` java
+package seedu.address.logic.commands;
+
+import static seedu.address.model.Model.PREDICATE_SHOW_ALL_TASKS;
+
+import java.util.List;
+
+import seedu.address.commons.core.Messages;
+import seedu.address.commons.core.index.Index;
+import seedu.address.logic.commands.exceptions.CommandException;
+import seedu.address.model.task.ReadOnlyTask;
+import seedu.address.model.task.Task;
+import seedu.address.model.task.exceptions.DuplicateTaskException;
+import seedu.address.model.task.exceptions.TaskNotFoundException;
+
+
+/**
+ * Sets the priority of a task identified as completed using it's last displayed index from the address book.
+ */
+public class SetPriorityCommand extends UndoableCommand {
+
+    public static final String COMMAND_WORD = "setPriority";
+    public static final String COMMAND_ALIAS = "stp";
+
+    public static final String MESSAGE_USAGE = COMMAND_WORD
+            + ": Sets the priority by the new value as the user specified, which is between 1~5\n"
+            + "Parameters: INDEX (must be a positive integer) c/PRIORITY (must be an integer between 1 and 5\n"
+            + "Example: " + COMMAND_WORD + " 1 c/2";
+
+    public static final String MESSAGE_UPDATE_TASK_PRIORITY_SUCCESS = "Updated the Priority of Task %1$s";
+    public static final String MESSAGE_UPDATE_TASK_PRIORITY_OUT_OF_RANGE = "Priority value should be 1~5";
+
+    private final Index targetIndex;
+    private final Integer priority;
+
+    public SetPriorityCommand(Index targetIndex, Integer priority) {
+        this.targetIndex = targetIndex;
+        this.priority = priority;
+    }
+
+
+    @Override
+    public CommandResult executeUndoableCommand() throws CommandException {
+
+        List<ReadOnlyTask> lastShownList = model.getSortedTaskList();
+
+        if (targetIndex.getZeroBased() >= lastShownList.size()) {
+            throw new CommandException(Messages.MESSAGE_INVALID_TASK_DISPLAYED_INDEX);
+        }
+
+        ReadOnlyTask taskToUpdate = lastShownList.get(targetIndex.getZeroBased());
+        Task updatedTask = createUpdatedTask(taskToUpdate, priority);
+
+        // Checking if the priority value inputted is out of range
+        if (updatedTask == null) {
+            throw new CommandException(MESSAGE_UPDATE_TASK_PRIORITY_OUT_OF_RANGE);
+        }
+
+        try {
+            model.updateTask(taskToUpdate, updatedTask);
+        } catch (TaskNotFoundException tnfe) {
+            assert false : "The target task cannot be missing";
+        } catch (DuplicateTaskException dte) {
+            assert false : "The target updated can cause duplication";
+        }
+
+        model.updateFilteredTaskList(PREDICATE_SHOW_ALL_TASKS);
+        return new CommandResult(String.format(MESSAGE_UPDATE_TASK_PRIORITY_SUCCESS, taskToUpdate.getName()));
+    }
+
+    /**
+     * Create an updated task by only modifying its priority property
+     * @param target , the targeted task to be edited
+     * @param value , the new priority value
+     * @return the updated task or null
+     */
+    public Task createUpdatedTask (ReadOnlyTask target, Integer value) {
+        // Preliminary checking
+        if (value < 0 || value > 5) {
+            return null;
+        }
+
+        Task updatedTask = new Task(
+                target.getName(),
+                target.getDescription(),
+                target.getStartDateTime(),
+                target.getEndDateTime(),
+                target.getTags(),
+                target.getComplete(),
+                value,
+                target.getId(),
+                target.getPeopleIds());
+
+        return updatedTask;
+    }
+
+
+    @Override
+    public boolean equals(Object other) {
+        return other == this // short circuit if same object
+                || (other instanceof SetPriorityCommand // instanceof handles nulls
+                && this.targetIndex.equals(((SetPriorityCommand) other).targetIndex)); // state check
+    }
+}
+```
+###### /java/seedu/address/storage/XmlAdaptedTask.java
 ``` java
 package seedu.address.storage;
 
@@ -2047,7 +1974,7 @@ public class XmlAdaptedTask {
 
 }
 ```
-###### \java\seedu\address\storage\XmlSerializableTaskBook.java
+###### /java/seedu/address/storage/XmlSerializableTaskBook.java
 ``` java
 package seedu.address.storage;
 
@@ -2124,7 +2051,56 @@ public class XmlSerializableTaskBook implements ReadOnlyTaskBook {
 
 }
 ```
-###### \java\seedu\address\storage\XmlTaskBookStorage.java
+###### /java/seedu/address/storage/TaskBookStorage.java
+``` java
+package seedu.address.storage;
+
+import java.io.IOException;
+import java.util.Optional;
+
+import seedu.address.commons.exceptions.DataConversionException;
+import seedu.address.model.ReadOnlyTaskBook;
+
+/**
+ * Represents a storage for task class
+ */
+public interface TaskBookStorage {
+
+    /**
+     * Returns the file path of the data file.
+     */
+    String getTaskBookFilePath();
+
+    /**
+     * Returns AddressBook data as a {@link ReadOnlyTaskBook}.
+     *   Returns {@code Optional.empty()} if storage file is not found.
+     * @throws DataConversionException if the data in storage is not in the expected format.
+     * @throws IOException if there was any problem when reading from the storage.
+     */
+    Optional<ReadOnlyTaskBook> readTaskBook() throws DataConversionException, IOException;
+
+    /**
+     * @see #getTaskBookFilePath()
+     */
+    Optional<ReadOnlyTaskBook> readTaskBook(String filePath) throws DataConversionException, IOException;
+
+    /**
+     * Saves the given {@link ReadOnlyTaskBook} to the storage.
+     * @param taskBook cannot be null.
+     * @throws IOException if there was any problem writing to the file.
+     */
+    void saveTaskBook(ReadOnlyTaskBook taskBook) throws IOException;
+
+    /**
+     * @see #saveTaskBook(ReadOnlyTaskBook)
+     */
+    void saveTaskBook(ReadOnlyTaskBook taskBook, String filePath) throws IOException;
+
+    void backupTaskBook(ReadOnlyTaskBook taskBook) throws IOException;
+
+}
+```
+###### /java/seedu/address/storage/XmlTaskBookStorage.java
 ``` java
 package seedu.address.storage;
 
@@ -2221,7 +2197,58 @@ public class XmlTaskBookStorage implements TaskBookStorage {
 
 }
 ```
-###### \java\seedu\address\ui\TaskCard.java
+###### /java/seedu/address/commons/events/model/TaskBookChangedEvent.java
+``` java
+package seedu.address.commons.events.model;
+
+import seedu.address.commons.events.BaseEvent;
+import seedu.address.model.ReadOnlyTaskBook;
+
+/** Indicates the AddressBook in the model has changed*/
+public class TaskBookChangedEvent extends BaseEvent {
+
+    public final ReadOnlyTaskBook data;
+
+    public TaskBookChangedEvent(ReadOnlyTaskBook data) {
+        this.data = data;
+    }
+
+    @Override
+    public String toString() {
+        return "number of tasks " + data.getTaskList().size() + ", number of tags " + data.getTagList().size();
+    }
+}
+```
+###### /java/seedu/address/commons/events/ui/TaskPanelSelectionChangedEvent.java
+``` java
+package seedu.address.commons.events.ui;
+
+import seedu.address.commons.events.BaseEvent;
+import seedu.address.ui.TaskCard;
+
+/**
+ * Represents a selection change in the Person List Panel
+ */
+public class TaskPanelSelectionChangedEvent extends BaseEvent {
+
+
+    private final TaskCard newSelection;
+
+    public TaskPanelSelectionChangedEvent(TaskCard newSelection) {
+        this.newSelection = newSelection;
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
+
+    public TaskCard getNewSelection() {
+        return newSelection;
+    }
+}
+```
+###### /java/seedu/address/ui/TaskCard.java
 ``` java
 package seedu.address.ui;
 
@@ -2353,7 +2380,7 @@ public class TaskCard extends UiPart<Region> {
     }
 
 ```
-###### \java\seedu\address\ui\TaskCard.java
+###### /java/seedu/address/ui/TaskCard.java
 ``` java
     @Override
     public boolean equals(Object other) {
@@ -2374,7 +2401,7 @@ public class TaskCard extends UiPart<Region> {
     }
 }
 ```
-###### \java\seedu\address\ui\TaskListPanel.java
+###### /java/seedu/address/ui/TaskListPanel.java
 ``` java
 package seedu.address.ui;
 
@@ -2464,64 +2491,4 @@ public class TaskListPanel extends UiPart<Region> {
         setConnections(uiList);
     }
 
-```
-###### \resources\view\TaskListCard.fxml
-``` fxml
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.FlowPane?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-
-<HBox id="cardPane" fx:id="cardPane" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
-  <GridPane HBox.hgrow="ALWAYS">
-    <columnConstraints>
-      <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="150" />
-    </columnConstraints>
-    <VBox alignment="CENTER_LEFT" minHeight="105" GridPane.columnIndex="0">
-      <padding>
-        <Insets bottom="5" left="15" right="5" top="5" />
-      </padding>
-      <HBox alignment="CENTER_LEFT" spacing="5">
-        <Label fx:id="id" styleClass="cell_big_label">
-          <minWidth>
-            <!-- Ensures that the label text is never truncated -->
-            <Region fx:constant="USE_PREF_SIZE" />
-          </minWidth>
-        </Label>
-        <Label fx:id="name" styleClass="cell_big_label" text="\$name" />
-            <Label fx:id="priority" alignment="CENTER_RIGHT" style="-fx-border-color: red; -fx-border-style: dotted; -fx-background-color: lightblue; -fx-text-fill: rgb(193, 66, 66);" textAlignment="RIGHT" textFill="#ff7803">
-               <font>
-                  <Font name="Courier Bold" size="18.0" />
-               </font>
-            </Label>
-```
-###### \resources\view\TaskListCard.fxml
-``` fxml
-      </HBox>
-      <FlowPane fx:id="tags" />
-      <Label fx:id="description" styleClass="cell_small_label" text="\$description" />
-      <Label fx:id="startDateTime" styleClass="cell_small_label" text="\$start" />
-      <Label fx:id="endDateTime" styleClass="cell_small_label" text="\$end" />
-    </VBox>
-      <rowConstraints>
-         <RowConstraints />
-      </rowConstraints>
-  </GridPane>
-</HBox>
-```
-###### \resources\view\TaskListPanel.fxml
-``` fxml
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.layout.VBox?>
-
-<VBox xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
-  <ListView fx:id="taskListView" VBox.vgrow="ALWAYS" />
-</VBox>
 ```
