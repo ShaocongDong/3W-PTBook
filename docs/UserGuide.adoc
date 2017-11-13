@@ -171,14 +171,17 @@ Examples:
 Shows a list of all persons in the address book. +
 Format: `list`/`l`
 
+
 ==== Clearing all persons : `clear`
 
 Clears all entries from the address book. +
 Format: `clear`/`c`
 
+// tag::xiaohan1[]
+
 ==== Locating persons by name: `find`
 
-Finds persons whose names contain any of the given keywords. +
+Finds persons whose names, email or address contain any of the given keywords. +
 Format: `find`/`f` +
 Details: `find KEYWORD [MORE_KEYWORDS]`
 
@@ -196,6 +199,7 @@ Examples:
 Returns `john` and `John Doe`
 * `find Betsy/Tim/John` +
 Returns any person having names `Betsy`, `Tim`, or `John`
+// end::xiaohan1[]
 
 ==== Selecting a person : `select`
 
@@ -239,6 +243,7 @@ Edits the phone number and email address of the 1st person to be `91234567` and 
 * `edit 2 n/Betsy Crower t/` +
 Edits the name of the 2nd person to be `Betsy Crower` and clears all existing tags.
 
+// tag::xiaohan2[]
 ==== Exporting a person to a string of add command : `export`
 
 Export the details of the person by the index number +
@@ -255,6 +260,7 @@ Examples:
 
 * `export 1` in the default setting +
 Returns `add n/Alex Yeoh p/87438807 e/alexyeoh@example.com a/Blk 30 Geylang Street 29, #06-40 r/ t/friends`
+// end::xiaohan2[]
 
 ==== Adding/Updating remark of a person : `remark`
 
@@ -327,6 +333,7 @@ Edits the tag of the 2nd task to be `teammates` only and others remain same.
 
 // end::kongjia1[]
 
+// tag::xiaohan3[]
 ==== Exporting a task to a string of addTask command: `exportTask`
 
 Export the details of the task by the index number +
@@ -343,6 +350,28 @@ Examples:
 
 * `export 1` in the default setting +
 Returns `addTask n/picnic d/have fun at Botanic Garden s/1/1/2099 12:00pm e/1/1/2099 15:00pm t/friends `
+
+==== Locating tasks by name: `findTask`
+
+Finds tasks whose names or description  contain any of the given keywords. +
+Format: `findTask`/`ft` +
+Details: `find KEYWORD [MORE_KEYWORDS]`
+
+****
+* The search is case insensitive. e.g `Picnic` will match `picnic`
+* The order of the keywords matters. e.g. `final exam` will not match `exam final`
+* Only the name/description are searched.
+* Full words are not need for matching e.g. `meet` will match `meeting`
+* Tasks matching at least one keyword will be returned (i.e. `OR` search). e.g. `final/meet` will return `CS2103 final`, `CS2101 meeting`
+****
+
+Examples:
+
+* `find picnic` +
+Returns any task having name/description `picnic`
+* `find picnic/meeting` +
+Returns any task having name/description `picnic` or `meeting`
+// end::xiaohan3[]
 
 // tag::shaocong2[]
 
