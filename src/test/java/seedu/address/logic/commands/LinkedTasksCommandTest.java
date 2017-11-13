@@ -43,7 +43,7 @@ public class LinkedTasksCommandTest {
         ArrayList<Integer> firstId = new ArrayList<>();
         ReadOnlyPerson firstPerson = model.getAddressBook().getPersonList().get(0);
         firstId.add(firstPerson.getId());
-        Task linkedTask= new Task(firstTask);
+        Task linkedTask = new Task(firstTask);
         linkedTask.setPeopleIds(firstId);
         try {
             model.updateTask(firstTask, linkedTask);
