@@ -41,16 +41,11 @@ then they'll be able to send this result line to their friends through social me
 ** Considering most user will not have the need of sharing a group of contact/task, and 3W is a desktop application, which makes communication on other windows more convenient, the mono-export is not a big problem.
 ** Unable to specify the export fields is troublesome. Users may not want to share their tags, descriptions, or remarks about contact/task with others. However, since the information is not real-time, user will always be able to modify the command result before sending them.
 
-==== Implementation
+=== Enhancement Proposed: link
 
----
-#Start of Extract [from: Developer Guide]#
+Originally suggested the group to link the contacts and tasks, aimed to achieve the result that when selecting a contact, linked tasks will be listed, and when selecting a task, linked contacts will be listed.
+This was later majorly implemented by my teammate https://github.com/nusjzx[Jia Zhixin]. I created mock UI picture for the logic (https://github.com/CS2103AUG2017-W15-B4/main/blob/master/docs/images/Ui_structure.png[1], https://github.com/CS2103AUG2017-W15-B4/main/blob/master/docs/images/Ui_contact.png[2], and https://github.com/CS2103AUG2017-W15-B4/main/blob/master/docs/images/Ui_task.png[3]).
 
-include::../DeveloperGuide.adoc[tag=un
-
-#End of Extract#
-
----
 
 === Other contributions
 
