@@ -1,3 +1,4 @@
+//@@author nusjzx
 package seedu.address.logic.commands;
 
 import java.util.List;
@@ -8,7 +9,7 @@ import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.task.ReadOnlyTask;
 
 /**
- * Selects a person identified using it's last displayed index from the address book.
+ * show Linked persons of a task
  */
 public class LinkedPersonsCommand extends Command {
 
@@ -46,7 +47,7 @@ public class LinkedPersonsCommand extends Command {
     @Override
     public boolean equals(Object other) {
         return other == this // short circuit if same object
-                || (other instanceof LinkedTasksCommand // instanceof handles nulls
+                || (other instanceof LinkedPersonsCommand // instanceof handles nulls
                 && this.targetIndex.equals(((LinkedPersonsCommand) other).targetIndex)); // state check
     }
 }
