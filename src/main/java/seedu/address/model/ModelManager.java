@@ -184,11 +184,6 @@ public class ModelManager extends ComponentManager implements Model {
     }
 
     @Override
-    public SortedList<ReadOnlyTask> getSortedTaskList() {
-        return sortedTasks;
-    }
-
-    @Override
     public void updateFilteredPersonList(Predicate<ReadOnlyPerson> predicate) {
         requireNonNull(predicate);
         filteredPersons.setPredicate(predicate);
@@ -200,11 +195,18 @@ public class ModelManager extends ComponentManager implements Model {
         filteredTasks.setPredicate(predicate);
     }
 
+    //@@author nusjzx
+    @Override
+    public SortedList<ReadOnlyTask> getSortedTaskList() {
+        return sortedTasks;
+    }
+
     @Override
     public void taskByEnd() {
         sortedTasks.setComparator((t1, t2) -> t1.getEndDateTime().toString().compareTo(t2.getEndDateTime().toString()));
     }
 
+    //@@author
     @Override
     public void taskByPriority() {
         sortedTasks.setComparator((t1, t2) -> t1.getPriority().compareTo(t2.getPriority()));
