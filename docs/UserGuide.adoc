@@ -286,71 +286,36 @@ Examples:
 
 // tag::shaocong1[]
 
-==== Selecting a task : `selectTask`
+==== Adding a new task : `addTask`
 
-Selects the task identified by the index number used in the last task listing. +
-Format: `selectTask`/`st` +
-Details: `selectTask INDEX`
+Adds a new task to the task book +
+Format: `addTask`/`at` +
+Details: `addTask n/TaskName d/Description s/startDateTime f/finishDateTime c/priority [t/TAG]...` +
 
-****
-* Selects the task and display the task at the specified `INDEX`.
-* The index refers to the index number shown in the most recent listing of tasks.
-* The index *must be a positive integer* `1, 2, 3, ...`
-****
+[TIP]
+A task can have any number of tags (including 0), the tag mechanism is the same as that for person. A task has a special field called priority (ranges from 1 to 5, with 1 being the most important). If a priority is not specified during adding of this task, a `normal` (3) priority  wil be set by default.
 
 Examples:
 
-* `select 2` +
-Selects the 2nd task in the task book.
+* `addTask n/picnic d/have fun at Botanic Garden s/1/1/2017 12:00pm f/1/1/2017 15:00pm c/3 t/friends`
 
-// end::shaocong1[]
-
-==== Listing all tasks : `listTask/`
-
-Shows a list of all tasks in the task book. +
-Format: `listTask`/`lt`
+//tag::shaocong1[]
 
 // tag::kongjia1[]
+==== Listing all tasks : `listTask/`
 
-==== Editing a new task : `editTask`
+Shows a list of all tasks in the task book,including all completed tasks, which are with green click . +
+Format: `listTask`/`lt`
+//end::kongjia1[]
 
-Edits an existing task in the address book +
-Format: `editTask`/`edt` +
-Details: `editTask INDEX [n/TaskName] [d/Description] [s/startDateTime] [f/finishDateTime] [t/TAG]...` +
+//tag::shaocong2[]
+==== Clearing all tasks : `clearTask`
 
-****
-* Edits the task at the specified `INDEX`. The index refers to the index number shown in the last task listing. The index *must be a positive integer* 1, 2, 3, ...
-* At least one of the optional fields must be provided.
-* Existing values will be updated to the input values.
-****
+Clears all entries from the task book. +
+Format: `clearTask`/`ct`
+//end::shaocong2[]
 
-Examples:
-
-* `editTask 1 n/picnic d/have fun at Botanic Garden s/1/1/2017 12:00pm f/1/1/2017 15:00pm t/friends`
-Edits the name, description, start time, finish time ad tag of the 1st task to be `picnic`, `have fun at Botanic Garden`, `1/1/2017 12:00pm`, `1/1/2017 15:00pm` and `friends` respectively.
-* `editTask 2 t/teammates`
-Edits the tag of the 2nd task to be `teammates` only and others remain same.
-
-// end::kongjia1[]
-
-// tag::xiaohan3[]
-==== Exporting a task to a string of addTask command: `exportTask`
-
-Export the details of the task by the index number +
-Format: `exportTask`/`ept` +
-Details: `exportTask INDEX`
-
-****
-* Exports the task at the specified `INDEX`, selects the task.
-* The index refers to the index number shown in the most recent listing.
-* The index *must be a positive integer* 1, 2, 3, ...
-****
-
-Examples:
-
-* `export 1` in the default setting +
-Returns `addTask n/picnic d/have fun at Botanic Garden s/1/1/2099 12:00pm e/1/1/2099 15:00pm t/friends `
-
+//tag::xiaohan1[]
 ==== Locating tasks by name: `findTask`
 
 Finds tasks whose names or description  contain any of the given keywords. +
@@ -371,9 +336,69 @@ Examples:
 Returns any task having name/description `picnic`
 * `find picnic/meeting` +
 Returns any task having name/description `picnic` or `meeting`
-// end::xiaohan3[]
+// end::xiaohan1[]
+//tag::shaocong3[]
+==== Selecting a task : `selectTask`
 
-// tag::shaocong2[]
+Selects the task identified by the index number used in the last task listing. +
+Format: `selectTask`/`st` +
+Details: `selectTask INDEX`
+
+****
+* Selects the task and display the task at the specified `INDEX`.
+* The index refers to the index number shown in the most recent listing of tasks.
+* The index *must be a positive integer* `1, 2, 3, ...`
+****
+
+Examples:
+
+* `select 2` +
+Selects the 2nd task in the task book.
+
+// end::shaocong3[]
+// tag::kongjia2[]
+==== Editing a new task : `editTask`
+
+Edits an existing task in the address book +
+Format: `editTask`/`edt` +
+Details: `editTask INDEX [n/TaskName] [d/Description] [s/startDateTime] [f/finishDateTime] [t/TAG]...` +
+
+****
+* Edits the task at the specified `INDEX`. The index refers to the index number shown in the last task listing. The index *must be a positive integer* 1, 2, 3, ...
+* At least one of the optional fields must be provided.
+* Existing values will be updated to the input values.
+****
+
+Examples:
+
+* `editTask 1 n/picnic d/have fun at Botanic Garden s/1/1/2017 12:00pm f/1/1/2017 15:00pm t/friends`
+Edits the name, description, start time, finish time ad tag of the 1st task to be `picnic`, `have fun at Botanic Garden`, `1/1/2017 12:00pm`, `1/1/2017 15:00pm` and `friends` respectively.
+* `editTask 2 t/teammates`
+Edits the tag of the 2nd task to be `teammates` only and others remain same.
+
+// end::kongjia2[]
+
+// tag::xiaohan2[]
+==== Exporting a task to a string of addTask command: `exportTask`
+
+Export the details of the task by the index number +
+Format: `exportTask`/`ept` +
+Details: `exportTask INDEX`
+
+****
+* Exports the task at the specified `INDEX`, selects the task.
+* The index refers to the index number shown in the most recent listing.
+* The index *must be a positive integer* 1, 2, 3, ...
+****
+
+Examples:
+
+* `export 1` in the default setting +
+Returns `addTask n/picnic d/have fun at Botanic Garden s/1/1/2099 12:00pm e/1/1/2099 15:00pm t/friends `
+//end ::xiaohan2[]
+
+
+// tag::shaocong4[]
 
 ==== Deleting a task : `deleteTask`
 
@@ -393,9 +418,9 @@ Examples:
 * `deleteTask` 1 +
 Deletes the 1st task in the task book.
 
-// end::shaocong2[]
+// end::shaocong4[]
 
-// tag::kongjia2[]
+// tag::kongjia3[]
 ==== Marking a task : `markTask`
 
 Marks the specific task from the task book. +
@@ -413,16 +438,9 @@ Examples:
 * `listTask` +
 * `markTask 1` +
 Marks the 1st task in the task book to be completed and the marked task will disappear in the result list.
-// end::kongjia2[]
-
-// tag::kongjia3[]
-==== Listing all tasks : `listTask`
-
-Shows a list of all tasks in the task book, including all completed tasks, which are with green click . +
-Format: `listTask`/`lt`
 // end::kongjia3[]
 
-// tag::shaocong3[]
+// tag::shaocong5[]
 
 ==== Setting a priority for a task : `setPriority`
 
@@ -449,34 +467,16 @@ A warning message is shown: A priority value is defined within integer range of 
 Sorts the task currently present in the taskBook by priority. +
 Format: `taskByPriority`/`tbp`
 
-// end::shaocong3[]
-
 ==== Sorting tasks by end date : `taskbyend`
 
 Sorts the list of tasks by their end date +
 Format: `taskByEnd`/`tbe`
 
-// tag::shaocong4[]
-
 [NOTE]
 ====
 This sorting will not affect the order of the tasks currently in the storage. However, the current index shown will be the index used for a specific task to `edit`, `delete`, `setPriority`, `mark`...
 ====
-
-==== Adding a new task : `addTask`
-
-Adds a new task to the task book +
-Format: `addTask`/`at` +
-Details: `addTask n/TaskName d/Description s/startDateTime f/finishDateTime c/priority [t/TAG]...` +
-
-[TIP]
-A task can have any number of tags (including 0), the tag mechanism is the same as that for person. A task has a special field called priority (ranges from 1 to 5, with 1 being the most important). If a priority is not specified during adding of this task, a `normal` (3) priority  wil be set by default.
-
-Examples:
-
-* `addTask n/picnic d/have fun at Botanic Garden s/1/1/2017 12:00pm f/1/1/2017 15:00pm c/3 t/friends`
-
-// end::shaocong4[]
+// end::shaocong5[]
 
 === link Operations
 
