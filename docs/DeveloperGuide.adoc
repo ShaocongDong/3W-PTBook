@@ -496,26 +496,28 @@ The unit tests stub classes and setUp methods should be updated accordingly. In 
 Certain properties of the application can be controlled (e.g App name, logging level) through the configuration file (default: `config.json`).
 
 === Route Planner mechanism
-
-The Route planner is done using the embedded webview component of JavaFX.
+//tag::route[]
+The Route planner uses the embedded webview component of JavaFX.
 
 ==== Design Consideration
 
 **Aspect:** Google Map version +
-**Problem:** We are not using the full version of Google Map. That is because the embedded browser doesn't support the requirement for running full version.
+**Problem:** We don't use the full version of Google Map. That is because the embedded browser doesn't support the requirement for running full version.
 Thus only the lite version is available. Also, location cannot be retrieved. +
 **solution:** We directly use the google map direction url, and fill in the ending point by the address. User can simply enter his current location.
+//end::route[]
 
 === link task to people
-
+//tag::link[]
 **Aspect**: Implementation of `link` +
-**Alternative 1 (current choice):** add indexes to each person and task, store linking people's index in task. +
+**Alternative 1 (current choice):** add indices to each person and task, store linking people's indices in task. +
 **Pros:** don't need additional overhead. +
 **Cons:** linking and searching linked items are inefficient. +
 
 **Alternative 2 :** store the data in relational database, link is a join table. +
 **Pros:** more efficient to do linking and searching linked items. +
 **Cons:** need users have relational database installed. +
+//end::link[]
 
 == Documentation
 

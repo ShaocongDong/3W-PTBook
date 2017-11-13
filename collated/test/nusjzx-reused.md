@@ -1,4 +1,84 @@
-//@@author nusjzx-reused
+# nusjzx-reused
+###### /java/seedu/address/model/person/RemarkTest.java
+``` java
+package seedu.address.model.person;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
+public class RemarkTest {
+
+    @Test
+    public void equals() {
+        Remark remark = new Remark("Hello");
+
+        // same object -> returns true
+        assertTrue(remark.equals(remark));
+
+        // same values -> returns true
+        Remark remarkCopy = new Remark(remark.value);
+        assertTrue(remark.equals(remarkCopy));
+
+        // different types -> returns false
+        assertFalse(remark.equals(1));
+
+        // null -> returns false
+        assertFalse(remark.equals(null));
+
+        // different person -> returns false
+        Remark differentRemark = new Remark("Bye");
+        assertFalse(remark.equals(differentRemark));
+    }
+}
+```
+###### /java/seedu/address/logic/parser/RemarkCommandParserTest.java
+``` java
+package seedu.address.logic.parser;
+
+import static seedu.address.commons.core.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_REMARK;
+import static seedu.address.logic.parser.CommandParserTestUtil.assertParseFailure;
+import static seedu.address.logic.parser.CommandParserTestUtil.assertParseSuccess;
+import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
+
+import org.junit.Test;
+
+import seedu.address.commons.core.index.Index;
+import seedu.address.logic.commands.RemarkCommand;
+import seedu.address.model.person.Remark;
+
+public class RemarkCommandParserTest {
+    private RemarkCommandParser parser = new RemarkCommandParser();
+
+    @Test
+    public void parse_indexSpecified_failure() throws Exception {
+        final Remark remark = new Remark("Some remark.");
+
+        // have remarks
+        Index targetIndex = INDEX_FIRST_PERSON;
+        String userInput = targetIndex.getOneBased() + " " + PREFIX_REMARK.toString() + " " + remark;
+        RemarkCommand expectedCommand = new RemarkCommand(INDEX_FIRST_PERSON, remark);
+        assertParseSuccess(parser, userInput, expectedCommand);
+
+        // no remarks
+        userInput = targetIndex.getOneBased() + " " + PREFIX_REMARK.toString();
+        expectedCommand = new RemarkCommand(INDEX_FIRST_PERSON, new Remark(""));
+        assertParseSuccess(parser, userInput, expectedCommand);
+    }
+
+    @Test
+    public void parse_noFieldSpecified_failure() throws Exception {
+        String expectedMessage = String.format(MESSAGE_INVALID_COMMAND_FORMAT, RemarkCommand.MESSAGE_USAGE);
+
+        // nothing at all
+        assertParseFailure(parser, RemarkCommand.COMMAND_WORD, expectedMessage);
+    }
+}
+```
+###### /java/seedu/address/logic/commands/RemarkCommandTest.java
+``` java
 package seedu.address.logic.commands;
 
 import static org.junit.Assert.assertFalse;
@@ -142,3 +222,4 @@ public class RemarkCommandTest {
         return remarkCommand;
     }
 }
+```

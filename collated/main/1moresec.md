@@ -417,5 +417,6 @@ public class ExportCommandTest {
         exportCommand.setData(model, new CommandHistory(), new UndoRedoStack());
         return exportCommand;
     }
+
 }
 ```

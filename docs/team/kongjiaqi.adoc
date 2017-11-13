@@ -22,9 +22,7 @@ ifdef::env-github,env-browser[:outfilesuffix: .adoc]
 ---
 #Start of Extract [from: User Guide]#
 
-include::../UserGuide.adoc[tag=kongjia1]
-include::../UserGuide.adoc[tag=kongjia2]
-include::../UserGuide.adoc[tag=kongjia3]
+include::../UserGuide.adoc[tag=undoredo]
 
 #End of Extract#
 

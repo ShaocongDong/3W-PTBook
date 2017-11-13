@@ -1,4 +1,85 @@
-//@@author nusjzx-reused
+# nusjzx-reused
+###### /java/seedu/address/model/person/Remark.java
+``` java
+package seedu.address.model.person;
+
+import static java.util.Objects.requireNonNull;
+
+/**
+ * Represents a Person's remark in the address book.
+ * Guarantees: immutable; is always valid
+ */
+public class Remark {
+
+    public static final String MESSAGE_REMARK_CONSTRAINTS =
+            "Person remarks can take any values, can even be blank";
+
+    public final String value;
+
+    public Remark(String remark) {
+        requireNonNull(remark);
+        this.value = remark;
+    }
+
+    @Override
+    public String toString() {
+        return value;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other == this // short circuit if same object
+                || (other instanceof Remark // instanceof handles nulls
+                && this.value.equals(((Remark) other).value)); // state check
+    }
+
+    @Override
+    public int hashCode() {
+        return value.hashCode();
+    }
+}
+```
+###### /java/seedu/address/logic/parser/RemarkCommandParser.java
+``` java
+package seedu.address.logic.parser;
+
+import static java.util.Objects.requireNonNull;
+import static seedu.address.commons.core.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_REMARK;
+
+import seedu.address.commons.core.index.Index;
+import seedu.address.commons.exceptions.IllegalValueException;
+import seedu.address.logic.commands.RemarkCommand;
+import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.person.Remark;
+
+/**
+ * Parses the given {@code String} of arguments in the context of the RemarkCommand
+ * and returns an RemarkCommand object for execution.
+ * @throws ParseException if the user input does not conform the expected format
+ */
+public class RemarkCommandParser implements Parser<RemarkCommand> {
+    @Override
+    public RemarkCommand parse(String args) throws ParseException {
+        requireNonNull(args);
+        ArgumentMultimap argMultimap =
+                ArgumentTokenizer.tokenize(args, PREFIX_REMARK);
+        Index index;
+
+        try {
+            index = ParserUtil.parseIndex(argMultimap.getPreamble());
+        } catch (IllegalValueException ive) {
+            throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, RemarkCommand.MESSAGE_USAGE));
+        }
+
+        String remark = argMultimap.getValue(PREFIX_REMARK).orElse("");
+
+        return new RemarkCommand(index, new Remark(remark));
+    }
+}
+```
+###### /java/seedu/address/logic/commands/RemarkCommand.java
+``` java
 package seedu.address.logic.commands;
 
 import static java.util.Objects.requireNonNull;
@@ -107,3 +188,4 @@ public class RemarkCommand extends UndoableCommand {
                 && remark.equals(e.remark);
     }
 }
+```
