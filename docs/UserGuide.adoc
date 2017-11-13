@@ -178,7 +178,7 @@ Format: `list`/`l`
 // tag::xiaohan1[]
 ==== Locating persons by name: `find`
 
-Finds persons whose names contain any of the given keywords. +
+Finds persons whose names, email or address contain any of the given keywords. +
 Format: `find`/`f` +
 Details: `find KEYWORD [MORE_KEYWORDS]`
 
@@ -325,6 +325,7 @@ Edits the tag of the 2nd task to be `teammates` only and others remain same.
 
 // end::kongjia1[]
 
+// tag::xiaohan3[]
 ==== Exporting a task to a string of addTask command: `exportTask`
 
 Export the details of the task by the index number +
@@ -341,6 +342,28 @@ Examples:
 
 * `export 1` in the default setting +
 Returns `addTask n/picnic d/have fun at Botanic Garden s/1/1/2099 12:00pm e/1/1/2099 15:00pm t/friends `
+
+==== Locating tasks by name: `findTask`
+
+Finds tasks whose names or description  contain any of the given keywords. +
+Format: `findTask`/`ft` +
+Details: `find KEYWORD [MORE_KEYWORDS]`
+
+****
+* The search is case insensitive. e.g `Picnic` will match `picnic`
+* The order of the keywords matters. e.g. `final exam` will not match `exam final`
+* Only the name/description are searched.
+* Full words are not need for matching e.g. `meet` will match `meeting`
+* Tasks matching at least one keyword will be returned (i.e. `OR` search). e.g. `final/meet` will return `CS2103 final`, `CS2101 meeting`
+****
+
+Examples:
+
+* `find picnic` +
+Returns any task having name/description `picnic`
+* `find picnic/meeting` +
+Returns any task having name/description `picnic` or `meeting`
+// end::xiaohan3[]
 
 // tag::shaocong2[]
 

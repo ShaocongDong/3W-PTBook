@@ -8,13 +8,12 @@ ifdef::env-github,env-browser[:outfilesuffix: .adoc]
 
 *Code contributed*: [https://github.com/CS2103AUG2017-W15-B4/main/blob/master/collated/main/1moresec.md[Functional code]] [https://github.com/CS2103AUG2017-W15-B4/main/blob/master/collated/test/1moresec.md[Test code]]
 
-=== Enhancement Added: Undo/Redo
+=== Enhancement Added: Find & Export
 . https://github.com/CS2103AUG2017-W15-B4/main/pull/9[UI enhancement on tag color]
 . https://github.com/CS2103AUG2017-W15-B4/main/pull/36[Export command]
 . https://github.com/CS2103AUG2017-W15-B4/main/pull/38[Enhance find command]
 . https://github.com/CS2103AUG2017-W15-B4/main/pull/50[UI theme change]
 . https://github.com/CS2103AUG2017-W15-B4/main/pull/72[Auto-completion for command]
-. https://github.com/CS2103AUG2017-W15-B4/main/pull/87[UI them change stage 2]
 . https://github.com/CS2103AUG2017-W15-B4/main/pull/89[Find task command]
 
 ==== External behavior
@@ -24,8 +23,7 @@ ifdef::env-github,env-browser[:outfilesuffix: .adoc]
 
 include::../UserGuide.adoc[tag=xiaohan1]
 include::../UserGuide.adoc[tag=xiaohan2]
-//include::../UserGuide.adoc[tag=xiaohan3]
-//include::../UserGuide.adoc[tag=xiaohan4]
+include::../UserGuide.adoc[tag=xiaohan3]
 
 #End of Extract#
 
@@ -33,28 +31,32 @@ include::../UserGuide.adoc[tag=xiaohan2]
 
 ==== Justification
 
-{Justify the need for, and the current design (i.e. external behavior) of, the feature}
+* Users will be able to use the `find`/`findTask` command series to search for contacts and tasks.
+** Considering the user needs, the contacts will be find by their `name`/`email`/`address`, and the tasks will be find by their `name`/`description`.
+** Future improvement can be made through supporting finding by tag, but that is more like a separate filter command instead of a part of find command functionality.
+
+* When different 3W users want to share a contact/task, they can reduce the amount of work needed for typing the command by using our `export`/`exportTask` command series, which will give them a line of result in a line of `add` series command.
+then they'll be able to send this result line to their friends through social media like WhatsApp. Their friend should be able to just copy and paste the line and add this shared contact/task.
+** This feature is currently implemented in a direct way. The user will be able to export one contact/task at a time, but will not able to export multiple contacts/tasks at the same time, and can not specify which fields to export and which are to be omitted.
+** Considering most user will not have the need of sharing a group of contact/task, and 3W is a desktop application, which makes communication on other windows more convenient, the mono-export is not a big problem.
+** Unable to specify the export fields is troublesome. Users may not want to share their tags, descriptions, or remarks about contact/task with others. However, since the information is not real-time, user will always be able to modify the command result before sending them.
 
 ==== Implementation
 
 ---
 #Start of Extract [from: Developer Guide]#
 
-include::../DeveloperGuide.adoc[tag=undoredo]
+include::../DeveloperGuide.adoc[tag=un
 
 #End of Extract#
 
 ---
 
-=== Enhancement Proposed: Add command `remark`
-
-{Explain similar to the Undo/Redo feature above.}
-
 === Other contributions
 
-* Updated the GUI color scheme (Pull requests https://github.com[#33], https://github.com[#34])
-* Wrote additional tests to increase coverage from 88% to 92% (Pull requests https://github.com[#36], https://github.com[#38])
-
-== Project: PowerPointLabs
-
-{Optionally (not graded), you may include other projects in your portfolio.}
+* Wrote some user stories (Pull requests https://github.com/CS2103AUG2017-W15-B4/main/pull/8[#8], https://github.com/CS2103AUG2017-W15-B4/main/pull/9[#9])
+* Add a column in GUI to show total number of people (https://github.com/CS2103AUG2017-W15-B4/main/pull/8/commits/1938c20be8043fe9f97989b43369dd6d39ae7992[commit link])
+* Multiple documentation work for the group (https://github.com/CS2103AUG2017-W15-B4/main/pull/12[PR link])
+* Set up the testing structure for the project (https://github.com/CS2103AUG2017-W15-B4/main/pull/35[PR link], https://travis-ci.org/CS2103AUG2017-W15-B4/main[travis], https://ci.appveyor.com/project/1moresec/main[AppVeyor], https://coveralls.io/github/CS2103AUG2017-W15-B4/main?branch=master[coverage], https://www.codacy.com/app/1moresec/main/dashboard[codacy])
+* Finalized GUI panel, including the color theme (the theme was inspired by the 1980s) and the size of each part (https://github.com/CS2103AUG2017-W15-B4/main/pull/87[UI them change stage 2])
+* Designed the logo for the application (https://github.com/CS2103AUG2017-W15-B4/main/blob/master/src/main/resources/images/www.png[image link])
