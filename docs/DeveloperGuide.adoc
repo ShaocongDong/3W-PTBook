@@ -421,12 +421,12 @@ We are using `java.util.logging` package for logging. The `LogsCenter` class is 
 === TaskBook
 We develop this application as a parallel of two similar application, namely addressBook and taskBook. They are similar in many ways, including comman commands like `add` for adding a person and `addTask` for adding a task. +
 
-Adding a taskBook to our application originated from our design requirements. In product v1.0, we have updated developer guide and user guide for a set of new functionalities specially designed for tasks. Thus, we need to add a taskBook to this application.
+Adding a `taskBook` to our application originated from our design requirements.
 
-* The taskBook is a set of parallel functionalities apart from the addressBook.
-* The taskBook is related to addressbook in the sense that we can link the person and task together.
-* taskBook and addressBook has the following independent components: `model`, `logic`, and `storage`.
-* taskBook and addressBook share the same user interface by taking up taskPanel and personPanel respectively.
+* The `taskBook` is a set of parallel functionalities apart from the addressBook.
+* The `taskBook` is related to `addressbook` in the sense that we can link the person and task together.
+* The `taskBook` and `addressBook` has the following independent components: `model`, `logic`, and `storage`.
+* The `taskBook` and `addressBook` share the same user interface by taking up taskPanel and personPanel respectively.
 
 With the extra taskBook working in parallel, the model interface should be modified in this way:
 [source,java]
@@ -468,7 +468,7 @@ AddressBookStorage addressBookStorage = new XmlAddressBookStorage(userPrefs.getA
 TaskBookStorage taskBookStorage = new XmlTaskBookStorage(userPrefs.getTaskBookFilePath());
 storage = new StorageManager(addressBookStorage, userPrefsStorage, taskBookStorage);
 ----
-The unit tests stub classes and setUp methods should be updated accordingly. +
+The unit tests stub classes and setUp methods should be updated accordingly. In addition, in order to make task's operations undoable and redoable, the `taskbook` states should be saved before each command's execution. +
 
 ==== Design Considerations
 

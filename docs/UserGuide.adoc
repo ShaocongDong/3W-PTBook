@@ -53,10 +53,11 @@ e.g. typing *`help`* and pressing kbd:[Enter] will open the help window.
 .  Some example commands you can try:
 
 * *`list`* : lists all contacts
-* **`add`**`n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01` : adds a contact named `John Doe` to the Address Book.
-* **`addTask`**`n/picnic d/have fun at Botanic Garden s/6/12/2017 12:00pm f/6/12/2017 15:00pm t/social
+* **`add`**`n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01` : adds a contact named `John Doe` to the Address Book
+* **`addTask`**`n/picnic d/have fun at Botanic Garden s/6/12/2017 12:00pm f/6/12/2017 15:00pm t/social` : adds a task named `picnic` to the Task Book
 * **`delete`**`3` : deletes the 3rd contact shown in the current contact list
-* **`undo`* : recover the contact deleted in the previous deletion
+* **`markTask`**`2` : marks the 2nd task shown in the current task list and the marked task will disappear in task list
+* *`undo`* : recover the contact deleted in the previous deletion
 * **`deleteTask`**`1` : deletes the 1st contact shown in the current task list
 * *`exit`* : exits the app
 
@@ -139,11 +140,6 @@ The `redo` command fails as there are no `undo` commands executed previously.
 `redo` (reapplies the `clear` command) +
 // end::undoredo[]
 
-==== Clearing all entries : `clear`
-
-Clears all entries from the address book. +
-Format: `clear`/`c`
-
 ==== Exiting the program : `exit`
 
 Exits the program. +
@@ -175,7 +171,14 @@ Examples:
 Shows a list of all persons in the address book. +
 Format: `list`/`l`
 
+
+==== Clearing all persons : `clear`
+
+Clears all entries from the address book. +
+Format: `clear`/`c`
+
 // tag::xiaohan1[]
+
 ==== Locating persons by name: `find`
 
 Finds persons whose names, email or address contain any of the given keywords. +
@@ -301,6 +304,11 @@ Examples:
 Selects the 2nd task in the task book.
 
 // end::shaocong1[]
+
+==== Listing all tasks : `listTask/`
+
+Shows a list of all tasks in the task book. +
+Format: `listTask`/`lt`
 
 // tag::kongjia1[]
 
