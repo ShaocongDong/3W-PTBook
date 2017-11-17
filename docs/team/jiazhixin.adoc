@@ -1,0 +1,87 @@
+= Jia Zhixin - Project Portfolio
+ifdef::env-github,env-browser[:outfilesuffix: .adoc]
+:imagesDir: ../images
+:stylesDir: ../stylesheets
+
+== Project: 3W
+3W which represents Who, What & Where, is a desktop address book and task book application designed for University students, business people and all those who have a busy daily schedule. The user can interact with it using a CLI, and it has a GUI created with JavaFX.
+Users can enjoy a well-organized life with our 3W.
+
+*Code contributed*: [https://github.com/CS2103AUG2017-W15-B4/main/blob/master/collated/main/nusjzx.md[functional code]][https://github.com/CS2103AUG2017-W15-B4/main/blob/master/collated/test/nusjzx.md[test code]]
+
+=== Enhancement Added: Add Remark Command
+
+==== External behavior
+
+---
+#Start of Extract [from: User Guide]#
+
+include::../UserGuide.adoc[tag=remark]
+
+#End of Extract#
+
+---
+
+=== Enhancement Added: Add Google Map in the browser panel, including the Route planning
+
+==== External behavior
+
+---
+#Start of Extract [from: User Guide]#
+
+include::../UserGuide.adoc[tag=route]
+
+#End of Extract#
+
+==== implementation
+
+---
+#Start of Extract [from: Developer Guide]#
+
+include::../DeveloperGuide.adoc[tag=route]
+
+#End of Extract#
+
+---
+
+=== Enhancement Added: Add Link Command
+
+==== External behavior
+
+---
+#Start of Extract [from: User Guide]#
+
+include::../UserGuide.adoc[tag=link]
+
+#End of Extract#
+
+---
+
+==== Implementation
+
+---
+#Start of Extract [from: Developer Guide]#
+
+include::../DeveloperGuide.adoc[tag=link]
+
+#End of Extract#
+
+---
+=== Enhancement Added: Add linkedTasks and linkedPersons Command
+
+==== External behavior
+
+---
+#Start of Extract [from: User Guide]#
+
+include::../UserGuide.adoc[tag=linkedTasks]
+
+#End of Extract#
+
+---
+
+=== Other contributions
+
+* Managing weekly group milestone
+* Making release for each version of the application
+* Changing language of developer guide to be more friendly

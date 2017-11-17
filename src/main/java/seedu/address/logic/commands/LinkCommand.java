@@ -1,6 +1,7 @@
+//@@author nusjzx
 package seedu.address.logic.commands;
 
-import static java.util.Objects.requireNonNull;
+import  static java.util.Objects.requireNonNull;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_PERSON;
 
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class LinkCommand extends UndoableCommand {
 
 
     public static final String MESSAGE_LINK_SUCCESS = "linked Task: %s with The following person(s): ";
-    public static final String MESSAGE_PERSON_LINKED = "person %d already linked.";
+    public static final String MESSAGE_DUPLICATE_PERSON_LINKED_FAILURE = "person %d already linked.";
 
     private final Index index;
     private final ArrayList<Index> personIndices;
@@ -68,7 +69,7 @@ public class LinkCommand extends UndoableCommand {
             personNameList += lastShownPersonList.get(index.getZeroBased()).getName() + " ";
             personId = chooseItem(lastShownPersonList, index).getId();
             if (peopleIds.contains(personId)) {
-                throw new CommandException(String.format(MESSAGE_PERSON_LINKED, index.getOneBased()));
+                throw new CommandException(String.format(MESSAGE_DUPLICATE_PERSON_LINKED_FAILURE, index.getOneBased()));
             }
 
             peopleIds.add(personId);
@@ -80,7 +81,7 @@ public class LinkCommand extends UndoableCommand {
         try {
             model.updateTask(targetTask, taskLinked);
         } catch (DuplicateTaskException e) {
-            throw new AssertionError("These people are already linked");
+            throw new AssertionError("can never reach this");
         } catch (TaskNotFoundException e) {
             throw new AssertionError("can never reach this");
         }

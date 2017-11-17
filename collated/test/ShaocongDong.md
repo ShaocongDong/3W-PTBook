@@ -1,36 +1,4 @@
 # ShaocongDong
-###### /java/seedu/address/logic/parser/SelectTaskCommandParserTest.java
-``` java
-package seedu.address.logic.parser;
-
-import static seedu.address.commons.core.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
-import static seedu.address.logic.parser.CommandParserTestUtil.assertParseFailure;
-import static seedu.address.logic.parser.CommandParserTestUtil.assertParseSuccess;
-import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_TASK;
-
-import org.junit.Test;
-
-import seedu.address.logic.commands.SelectTaskCommand;
-
-/**
- * Test scope: similar to {@code DeleteCommandParserTest}.
- * @see DeleteCommandParserTest
- */
-public class SelectTaskCommandParserTest {
-
-    private SelectTaskCommandParser parser = new SelectTaskCommandParser();
-
-    @Test
-    public void parse_validArgs_returnsSelectCommand() {
-        assertParseSuccess(parser, "1", new SelectTaskCommand(INDEX_FIRST_TASK));
-    }
-
-    @Test
-    public void parse_invalidArgs_throwsParseException() {
-        assertParseFailure(parser, "a", String.format(MESSAGE_INVALID_COMMAND_FORMAT, SelectTaskCommand.MESSAGE_USAGE));
-    }
-}
-```
 ###### /java/seedu/address/logic/parser/AddTaskCommandParserTest.java
 ``` java
 package seedu.address.logic.parser;
@@ -128,139 +96,183 @@ public class AddTaskCommandParserTest {
 
 }
 ```
-###### /java/seedu/address/logic/commands/SetPriorityCommandTest.java
+###### /java/seedu/address/logic/parser/SelectTaskCommandParserTest.java
+``` java
+package seedu.address.logic.parser;
+
+import static seedu.address.commons.core.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
+import static seedu.address.logic.parser.CommandParserTestUtil.assertParseFailure;
+import static seedu.address.logic.parser.CommandParserTestUtil.assertParseSuccess;
+import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_TASK;
+
+import org.junit.Test;
+
+import seedu.address.logic.commands.SelectTaskCommand;
+
+/**
+ * Test scope: similar to {@code DeleteCommandParserTest}.
+ * @see DeleteCommandParserTest
+ */
+public class SelectTaskCommandParserTest {
+
+    private SelectTaskCommandParser parser = new SelectTaskCommandParser();
+
+    @Test
+    public void parse_validArgs_returnsSelectCommand() {
+        assertParseSuccess(parser, "1", new SelectTaskCommand(INDEX_FIRST_TASK));
+    }
+
+    @Test
+    public void parse_invalidArgs_throwsParseException() {
+        assertParseFailure(parser, "a", String.format(MESSAGE_INVALID_COMMAND_FORMAT, SelectTaskCommand.MESSAGE_USAGE));
+    }
+}
+```
+###### /java/seedu/address/logic/commands/DeleteTaskCommandTest.java
 ``` java
 package seedu.address.logic.commands;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static seedu.address.logic.commands.CommandTestUtil.assertCommandFailure;
+import static seedu.address.logic.commands.CommandTestUtil.assertCommandSuccess;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_TASK;
 import static seedu.address.testutil.TypicalIndexes.INDEX_SECOND_TASK;
-import static seedu.address.testutil.TypicalIndexes.INDEX_THIRD_TASK;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 import static seedu.address.testutil.TypicalTasks.getTypicalTaskbook;
 
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
 import seedu.address.commons.core.Messages;
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.CommandHistory;
 import seedu.address.logic.UndoRedoStack;
-import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
-import seedu.address.ui.testutil.EventsCollectorRule;
+import seedu.address.model.task.ReadOnlyTask;
 
 /**
- * Contains integration tests (interaction with the Model) for {@code SetPriorityCommandTest}.
+ * Contains integration tests (interaction with the Model) and unit tests for {@code DeleteCommand}.
  */
-public class SetPriorityCommandTest {
-    @Rule
-    public final EventsCollectorRule eventsCollectorRule = new EventsCollectorRule();
+public class DeleteTaskCommandTest {
 
-    private Model model;
+    private Model model = new ModelManager(getTypicalAddressBook(), getTypicalTaskbook(), new UserPrefs());
 
-    @Before
-    public void setUp() {
-        model = new ModelManager(getTypicalAddressBook(), getTypicalTaskbook(), new UserPrefs());
+    @Test
+    public void execute_validIndexList_success() throws Exception {
+        ReadOnlyTask taskToDelete = model.getFilteredTaskList().get(INDEX_FIRST_TASK.getZeroBased());
+        DeleteTaskCommand deleteTaskCommand = prepareCommand(INDEX_FIRST_TASK);
+
+
+        String expectedMessage = String.format(DeleteTaskCommand.MESSAGE_DELETE_TASK_SUCCESS, taskToDelete);
+
+        ModelManager expectedModel = new ModelManager(model.getAddressBook(), model.getTaskBook(), new UserPrefs());
+
+        expectedModel.deleteTask(taskToDelete);
+
+        assertCommandSuccess(deleteTaskCommand, model, expectedMessage, expectedModel);
     }
 
     @Test
-    public void executeValidIndexUnfilteredListSuccess() {
-        Index lastTaskIndex = Index.fromOneBased(model.getFilteredTaskList().size());
+    public void execute_invalidIndexList_throwsCommandException() throws Exception {
+        Index outOfBoundIndex = Index.fromOneBased(model.getFilteredTaskList().size() + 1);
+        DeleteTaskCommand deleteTaskCommand = prepareCommand(outOfBoundIndex);
 
-        assertExecutionSuccess(INDEX_FIRST_TASK, 1);
-        assertExecutionSuccess(INDEX_THIRD_TASK, 1);
-        assertExecutionSuccess(lastTaskIndex, 1);
-    }
-
-    @Test
-    public void executeInvalidIndexUnfilteredListFailure() {
-        Index outOfBoundsIndex = Index.fromOneBased(model.getFilteredTaskList().size() + 1);
-
-        assertExecutionFailure(outOfBoundsIndex, 1, Messages.MESSAGE_INVALID_TASK_DISPLAYED_INDEX);
-    }
-
-    @Test
-    public void executeInvalidPriorityValueFailure() {
-        Index lastTaskIndex = Index.fromOneBased(model.getFilteredTaskList().size());
-
-        assertExecutionFailure(lastTaskIndex, 100, SetPriorityCommand.MESSAGE_UPDATE_TASK_PRIORITY_OUT_OF_RANGE);
-
+        assertCommandFailure(deleteTaskCommand, model, Messages.MESSAGE_INVALID_TASK_DISPLAYED_INDEX);
     }
 
     @Test
     public void equals() {
-        SetPriorityCommand setPriorityFirstCommand = new SetPriorityCommand(INDEX_FIRST_TASK, 1);
-        SetPriorityCommand setPrioritySecondCommand = new SetPriorityCommand(INDEX_SECOND_TASK, 2);
+        DeleteTaskCommand deleteFirstCommand = new DeleteTaskCommand(INDEX_FIRST_TASK);
+        DeleteTaskCommand deleteSecondCommand = new DeleteTaskCommand(INDEX_SECOND_TASK);
 
-        // same object
-        assertTrue(setPriorityFirstCommand.equals(setPriorityFirstCommand));
+        // same object -> returns true
+        assertTrue(deleteFirstCommand.equals(deleteFirstCommand));
 
         // same values -> returns true
-        SetPriorityCommand setPriorityFirstCommandCopy = new SetPriorityCommand(INDEX_FIRST_TASK, 1);
-        assertTrue(setPriorityFirstCommand.equals(setPriorityFirstCommandCopy));
+        DeleteTaskCommand deleteFirstCommandCopy = new DeleteTaskCommand(INDEX_FIRST_TASK);
+        assertTrue(deleteFirstCommand.equals(deleteFirstCommandCopy));
 
         // different types -> returns false
-        assertFalse(setPriorityFirstCommand.equals(1));
+        assertFalse(deleteFirstCommand.equals(1));
 
         // null -> returns false
-        assertFalse(setPriorityFirstCommand == null);
+        assertFalse(deleteFirstCommand.equals(null));
 
         // different task -> returns false
-        assertFalse(setPriorityFirstCommand.equals(setPrioritySecondCommand));
+        assertFalse(deleteFirstCommand.equals(deleteSecondCommand));
     }
 
     /**
-     * Executes a {@code SetPriorityCommand} with the given {@code index}, and checks that
-     * the updated task priority is properly reflected.
+     * Returns a {@code DeleteTaskCommand} with the parameter {@code index}.
      */
-    private void assertExecutionSuccess(Index index, Integer value) {
-        SetPriorityCommand setPriorityCommand = prepareCommand(index, value);
-        int indexInteger = index.getZeroBased();
-
-        try {
-            CommandResult commandResult = setPriorityCommand.execute();
-            assertEquals(String.format(SetPriorityCommand.MESSAGE_UPDATE_TASK_PRIORITY_SUCCESS,
-                    getTypicalTaskbook().getTaskList().get(indexInteger).getName()),
-                    commandResult.feedbackToUser);
-        } catch (CommandException ce) {
-            throw new IllegalArgumentException("Execution of command should not fail.", ce);
-        }
-
-        assertEquals(value, model.getTaskBook().getTaskList().get(indexInteger).getPriority());
+    private DeleteTaskCommand prepareCommand(Index index) {
+        DeleteTaskCommand deleteTaskCommand = new DeleteTaskCommand(index);
+        deleteTaskCommand.setData(model, new CommandHistory(), new UndoRedoStack());
+        return deleteTaskCommand;
     }
 
     /**
-     * Assert execution failure by default, a wrong execution command inputted.
-     * @param index , the index of the task
-     * @param value , the new priority
-     * @param expectedMessage , the expected message String
+     * Updates {@code model}'s filtered list to show no task.
      */
-    private void assertExecutionFailure(Index index, Integer value, String expectedMessage) {
-        SetPriorityCommand setPriorityCommand = prepareCommand(index, value);
+    private void showNoTask(Model model) {
+        model.updateFilteredTaskList(p -> false);
 
-        try {
-            setPriorityCommand.execute();
-            fail("The expected CommandException was not thrown.");
-        } catch (CommandException ce) {
-            assertEquals(expectedMessage, ce.getMessage());
-            assertTrue(eventsCollectorRule.eventsCollector.isEmpty());
+        assert model.getFilteredTaskList().isEmpty();
+    }
+}
+```
+###### /java/seedu/address/logic/commands/AddCommandTest.java
+``` java
+        @Override
+        public ReadOnlyTaskBook getTaskBook() {
+            return new TaskBook();
         }
     }
 
+}
+```
+###### /java/seedu/address/logic/commands/ClearTaskCommandTest.java
+``` java
+package seedu.address.logic.commands;
+
+import static seedu.address.logic.commands.CommandTestUtil.assertCommandSuccess;
+import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
+import static seedu.address.testutil.TypicalTasks.getTypicalTaskbook;
+
+import org.junit.Test;
+
+import seedu.address.logic.CommandHistory;
+import seedu.address.logic.UndoRedoStack;
+import seedu.address.model.Model;
+import seedu.address.model.ModelManager;
+import seedu.address.model.TaskBook;
+import seedu.address.model.UserPrefs;
+
+public class ClearTaskCommandTest {
+
+    @Test
+    public void executeEmptyAddressBookSuccess() {
+        Model model = new ModelManager();
+        Model expectedModel = new ModelManager();
+        assertCommandSuccess(prepareCommand(model), model, ClearTaskCommand.MESSAGE_SUCCESS, expectedModel);
+    }
+
+    @Test
+    public void executeNonEmptyTaskBookSuccess() {
+        Model model = new ModelManager(getTypicalAddressBook(), getTypicalTaskbook(), new UserPrefs());
+        Model expectedModel = new ModelManager(getTypicalAddressBook(), new TaskBook(), new UserPrefs());
+        assertCommandSuccess(prepareCommand(model), model, ClearTaskCommand.MESSAGE_SUCCESS, model);
+    }
+
     /**
-     * Returns a {@code SetPriorityCommand} with parameters {@code index}.
+     * Generates a new {@code ClearTaskCommand} which upon execution, clears the contents in {@code model}.
      */
-    private SetPriorityCommand prepareCommand(Index index, Integer value) {
-        SetPriorityCommand setPriorityCommand = new SetPriorityCommand(index, value);
-        setPriorityCommand.setData(model, new CommandHistory(), new UndoRedoStack());
-        return setPriorityCommand;
+    private ClearTaskCommand prepareCommand(Model model) {
+        ClearTaskCommand command = new ClearTaskCommand();
+        command.setData(model, new CommandHistory(), new UndoRedoStack());
+        return command;
     }
 }
 ```
@@ -494,49 +506,6 @@ public class AddTaskCommandTest {
 
 }
 ```
-###### /java/seedu/address/logic/commands/ClearTaskCommandTest.java
-``` java
-package seedu.address.logic.commands;
-
-import static seedu.address.logic.commands.CommandTestUtil.assertCommandSuccess;
-import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
-import static seedu.address.testutil.TypicalTasks.getTypicalTaskbook;
-
-import org.junit.Test;
-
-import seedu.address.logic.CommandHistory;
-import seedu.address.logic.UndoRedoStack;
-import seedu.address.model.Model;
-import seedu.address.model.ModelManager;
-import seedu.address.model.TaskBook;
-import seedu.address.model.UserPrefs;
-
-public class ClearTaskCommandTest {
-
-    @Test
-    public void executeEmptyAddressBookSuccess() {
-        Model model = new ModelManager();
-        Model expectedModel = new ModelManager();
-        assertCommandSuccess(prepareCommand(model), model, ClearTaskCommand.MESSAGE_SUCCESS, expectedModel);
-    }
-
-    @Test
-    public void executeNonEmptyTaskBookSuccess() {
-        Model model = new ModelManager(getTypicalAddressBook(), getTypicalTaskbook(), new UserPrefs());
-        Model expectedModel = new ModelManager(getTypicalAddressBook(), new TaskBook(), new UserPrefs());
-        assertCommandSuccess(prepareCommand(model), model, ClearTaskCommand.MESSAGE_SUCCESS, model);
-    }
-
-    /**
-     * Generates a new {@code ClearTaskCommand} which upon execution, clears the contents in {@code model}.
-     */
-    private ClearTaskCommand prepareCommand(Model model) {
-        ClearTaskCommand command = new ClearTaskCommand();
-        command.setData(model, new CommandHistory(), new UndoRedoStack());
-        return command;
-    }
-}
-```
 ###### /java/seedu/address/logic/commands/SelectTaskCommandTest.java
 ``` java
 package seedu.address.logic.commands;
@@ -664,16 +633,6 @@ public class SelectTaskCommandTest {
     }
 }
 ```
-###### /java/seedu/address/logic/commands/AddCommandTest.java
-``` java
-        @Override
-        public ReadOnlyTaskBook getTaskBook() {
-            return new TaskBook();
-        }
-    }
-
-}
-```
 ###### /java/seedu/address/logic/commands/TaskByPriorityCommandTest.java
 ``` java
 package seedu.address.logic.commands;
@@ -715,98 +674,139 @@ public class TaskByPriorityCommandTest {
     }
 }
 ```
-###### /java/seedu/address/logic/commands/DeleteTaskCommandTest.java
+###### /java/seedu/address/logic/commands/SetPriorityCommandTest.java
 ``` java
 package seedu.address.logic.commands;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static seedu.address.logic.commands.CommandTestUtil.assertCommandFailure;
-import static seedu.address.logic.commands.CommandTestUtil.assertCommandSuccess;
+import static org.junit.Assert.fail;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_TASK;
 import static seedu.address.testutil.TypicalIndexes.INDEX_SECOND_TASK;
+import static seedu.address.testutil.TypicalIndexes.INDEX_THIRD_TASK;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 import static seedu.address.testutil.TypicalTasks.getTypicalTaskbook;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import seedu.address.commons.core.Messages;
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.CommandHistory;
 import seedu.address.logic.UndoRedoStack;
+import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
-import seedu.address.model.task.ReadOnlyTask;
+import seedu.address.ui.testutil.EventsCollectorRule;
 
 /**
- * Contains integration tests (interaction with the Model) and unit tests for {@code DeleteCommand}.
+ * Contains integration tests (interaction with the Model) for {@code SetPriorityCommandTest}.
  */
-public class DeleteTaskCommandTest {
+public class SetPriorityCommandTest {
+    @Rule
+    public final EventsCollectorRule eventsCollectorRule = new EventsCollectorRule();
 
-    private Model model = new ModelManager(getTypicalAddressBook(), getTypicalTaskbook(), new UserPrefs());
+    private Model model;
 
-    @Test
-    public void execute_validIndexList_success() throws Exception {
-        ReadOnlyTask taskToDelete = model.getFilteredTaskList().get(INDEX_FIRST_TASK.getZeroBased());
-        DeleteTaskCommand deleteTaskCommand = prepareCommand(INDEX_FIRST_TASK);
-
-
-        String expectedMessage = String.format(DeleteTaskCommand.MESSAGE_DELETE_TASK_SUCCESS, taskToDelete);
-
-        ModelManager expectedModel = new ModelManager(model.getAddressBook(), model.getTaskBook(), new UserPrefs());
-
-        expectedModel.deleteTask(taskToDelete);
-
-        assertCommandSuccess(deleteTaskCommand, model, expectedMessage, expectedModel);
+    @Before
+    public void setUp() {
+        model = new ModelManager(getTypicalAddressBook(), getTypicalTaskbook(), new UserPrefs());
     }
 
     @Test
-    public void execute_invalidIndexList_throwsCommandException() throws Exception {
-        Index outOfBoundIndex = Index.fromOneBased(model.getFilteredTaskList().size() + 1);
-        DeleteTaskCommand deleteTaskCommand = prepareCommand(outOfBoundIndex);
+    public void executeValidIndexUnfilteredListSuccess() {
+        Index lastTaskIndex = Index.fromOneBased(model.getFilteredTaskList().size());
 
-        assertCommandFailure(deleteTaskCommand, model, Messages.MESSAGE_INVALID_TASK_DISPLAYED_INDEX);
+        assertExecutionSuccess(INDEX_FIRST_TASK, 1);
+        assertExecutionSuccess(INDEX_THIRD_TASK, 1);
+        assertExecutionSuccess(lastTaskIndex, 1);
+    }
+
+    @Test
+    public void executeInvalidIndexUnfilteredListFailure() {
+        Index outOfBoundsIndex = Index.fromOneBased(model.getFilteredTaskList().size() + 1);
+
+        assertExecutionFailure(outOfBoundsIndex, 1, Messages.MESSAGE_INVALID_TASK_DISPLAYED_INDEX);
+    }
+
+    @Test
+    public void executeInvalidPriorityValueFailure() {
+        Index lastTaskIndex = Index.fromOneBased(model.getFilteredTaskList().size());
+
+        assertExecutionFailure(lastTaskIndex, 100, SetPriorityCommand.MESSAGE_UPDATE_TASK_PRIORITY_OUT_OF_RANGE);
+
     }
 
     @Test
     public void equals() {
-        DeleteTaskCommand deleteFirstCommand = new DeleteTaskCommand(INDEX_FIRST_TASK);
-        DeleteTaskCommand deleteSecondCommand = new DeleteTaskCommand(INDEX_SECOND_TASK);
+        SetPriorityCommand setPriorityFirstCommand = new SetPriorityCommand(INDEX_FIRST_TASK, 1);
+        SetPriorityCommand setPrioritySecondCommand = new SetPriorityCommand(INDEX_SECOND_TASK, 2);
 
-        // same object -> returns true
-        assertTrue(deleteFirstCommand.equals(deleteFirstCommand));
+        // same object
+        assertTrue(setPriorityFirstCommand.equals(setPriorityFirstCommand));
 
         // same values -> returns true
-        DeleteTaskCommand deleteFirstCommandCopy = new DeleteTaskCommand(INDEX_FIRST_TASK);
-        assertTrue(deleteFirstCommand.equals(deleteFirstCommandCopy));
+        SetPriorityCommand setPriorityFirstCommandCopy = new SetPriorityCommand(INDEX_FIRST_TASK, 1);
+        assertTrue(setPriorityFirstCommand.equals(setPriorityFirstCommandCopy));
 
         // different types -> returns false
-        assertFalse(deleteFirstCommand.equals(1));
+        assertFalse(setPriorityFirstCommand.equals(1));
 
         // null -> returns false
-        assertFalse(deleteFirstCommand.equals(null));
+        assertFalse(setPriorityFirstCommand == null);
 
         // different task -> returns false
-        assertFalse(deleteFirstCommand.equals(deleteSecondCommand));
+        assertFalse(setPriorityFirstCommand.equals(setPrioritySecondCommand));
     }
 
     /**
-     * Returns a {@code DeleteTaskCommand} with the parameter {@code index}.
+     * Executes a {@code SetPriorityCommand} with the given {@code index}, and checks that
+     * the updated task priority is properly reflected.
      */
-    private DeleteTaskCommand prepareCommand(Index index) {
-        DeleteTaskCommand deleteTaskCommand = new DeleteTaskCommand(index);
-        deleteTaskCommand.setData(model, new CommandHistory(), new UndoRedoStack());
-        return deleteTaskCommand;
+    private void assertExecutionSuccess(Index index, Integer value) {
+        SetPriorityCommand setPriorityCommand = prepareCommand(index, value);
+        int indexInteger = index.getZeroBased();
+
+        try {
+            CommandResult commandResult = setPriorityCommand.execute();
+            assertEquals(String.format(SetPriorityCommand.MESSAGE_UPDATE_TASK_PRIORITY_SUCCESS,
+                    getTypicalTaskbook().getTaskList().get(indexInteger).getName()),
+                    commandResult.feedbackToUser);
+        } catch (CommandException ce) {
+            throw new IllegalArgumentException("Execution of command should not fail.", ce);
+        }
+
+        assertEquals(value, model.getTaskBook().getTaskList().get(indexInteger).getPriority());
     }
 
     /**
-     * Updates {@code model}'s filtered list to show no task.
+     * Assert execution failure by default, a wrong execution command inputted.
+     * @param index , the index of the task
+     * @param value , the new priority
+     * @param expectedMessage , the expected message String
      */
-    private void showNoTask(Model model) {
-        model.updateFilteredTaskList(p -> false);
+    private void assertExecutionFailure(Index index, Integer value, String expectedMessage) {
+        SetPriorityCommand setPriorityCommand = prepareCommand(index, value);
 
-        assert model.getFilteredTaskList().isEmpty();
+        try {
+            setPriorityCommand.execute();
+            fail("The expected CommandException was not thrown.");
+        } catch (CommandException ce) {
+            assertEquals(expectedMessage, ce.getMessage());
+            assertTrue(eventsCollectorRule.eventsCollector.isEmpty());
+        }
+    }
+
+    /**
+     * Returns a {@code SetPriorityCommand} with parameters {@code index}.
+     */
+    private SetPriorityCommand prepareCommand(Index index, Integer value) {
+        SetPriorityCommand setPriorityCommand = new SetPriorityCommand(index, value);
+        setPriorityCommand.setData(model, new CommandHistory(), new UndoRedoStack());
+        return setPriorityCommand;
     }
 }
 ```

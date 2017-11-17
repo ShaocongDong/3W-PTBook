@@ -1,3 +1,4 @@
+//@@author nusjzx-reused
 package seedu.address.model.person;
 
 import static java.util.Objects.requireNonNull;

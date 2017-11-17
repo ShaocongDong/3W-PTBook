@@ -1,3 +1,4 @@
+//@@author nusjzx
 package seedu.address.logic.parser;
 
 import static seedu.address.commons.core.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
@@ -8,13 +9,13 @@ import seedu.address.logic.commands.LinkedTasksCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 
 /**
- * Parses input arguments and creates a new SelectCommand object
+ * Parses input arguments and creates a new LinkedTasksCommand object
  */
 public class LinkedTasksCommandParser implements Parser<LinkedTasksCommand> {
 
     /**
-     * Parses the given {@code String} of arguments in the context of the SelectCommand
-     * and returns an SelectCommand object for execution.
+     * Parses the given {@code String} of arguments in the context of the LinkedTasksCommand
+     * and returns an LinkedTasksCommand object for execution.
      * @throws ParseException if the user input does not conform the expected format
      */
     public LinkedTasksCommand parse(String args) throws ParseException {
